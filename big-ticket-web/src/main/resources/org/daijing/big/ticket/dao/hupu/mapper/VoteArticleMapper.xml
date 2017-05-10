@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.daijing.big.ticket.dao.hupu.mapper.VoteArticleMapper" >
+
+    <resultMap id="BaseResultMap" type="org.daijing.big.ticket.dao.hupu.po.VoteArticlePO" >
+        <result column="id" property="id" jdbcType="INTEGER" />
+        <result column="article_id" property="articleId" jdbcType="INTEGER" />
+        <result column="title" property="title" jdbcType="VARCHAR" />
+        <result column="link" property="link" jdbcType="VARCHAR" />
+        <result column="reply_count" property="replyCount" jdbcType="INTEGER" />
+        <result column="page_view_count" property="pageViewCount" jdbcType="INTEGER" />
+        <result column="last_reply_time" property="lastReplyTime" jdbcType="TIMESTAMP" />
+        <result column="gmt_create" property="gmtCreate" jdbcType="TIMESTAMP" />
+        <result column="gmt_modified" property="gmtModified" jdbcType="TIMESTAMP" />
+    </resultMap>
+
+    <sql id="Base_Column_List" >
+        article_id, title, link, reply_count, page_view_count, last_reply_time, gmt_create
+    </sql>
+
+    <insert id="add">
+        INSERT INTO vote_article(article_id,title,link,reply_count,page_view_count,last_reply_time,gmt_create)
+        VALUES (1001, '你好15', 'GA', 10, 20, now(), now())
+    </insert>
+
+    <insert id="batchAdd">
+        INSERT INTO vote_article(<include refid="Base_Column_List"/> )
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.articleId}, #{item.title}, #{item.link}, #{item.replyCount}, #{item.pageViewCount}, #{item.lastReplyTime}, now())
+        </foreach>
+        ON duplicate KEY UPDATE
+        title = VALUES(title),
+        link = VALUES(link),
+        reply_count = VALUES(reply_count),
+        page_view_count = VALUES(page_view_count),
+        last_reply_time = VALUES(last_reply_time)
+    </insert>
+
+</mapper>

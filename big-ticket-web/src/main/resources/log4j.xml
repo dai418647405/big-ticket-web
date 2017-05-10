@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration PUBLIC "-//LOGGER" "http://logging.apache.org/log4j/1.2/apidocs/org/apache/log4j/xml/doc-files/log4j.dtd">
+
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+    <appender name="stdout" class="org.apache.log4j.ConsoleAppender">
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d{yyyy/MM/dd HH:mm:ss.SSS} %p [%c-%t] - %m%n" />
+        </layout>
+        <filter class="org.apache.log4j.varia.LevelRangeFilter">
+            <param name="LevelMin" value="INFO" />
+            <param name="LevelMax" value="FATAL" />
+            <param name="AcceptOnMatch" value="true" />
+        </filter>
+    </appender>
+
+    <appender name="fileLog" class="org.apache.log4j.DailyRollingFileAppender">
+        <param name="file" value="/data/applogs/big-ticket-web/logs/big-ticket-web.log" />
+        <param name="append" value="true" />
+        <param name="maxBackupIndex" value="14" />
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d{yyyy/MM/dd HH:mm:ss.SSS} %p [%c] - %m%n" />
+        </layout>
+        <filter class="org.apache.log4j.varia.LevelRangeFilter">
+            <param name="LevelMin" value="INFO" />
+            <param name="LevelMax" value="FATAL" />
+            <param name="AcceptOnMatch" value="true" />
+        </filter>
+    </appender>
+
+    <appender name="refreshCacheLog"
+              class="org.apache.log4j.DailyRollingFileAppender">
+        <param name="file" value="/data/applogs/big-ticket-web/logs/refreshCache.log"></param>
+        <param name="append" value="true" />
+        <param name="Threshold" value="info"></param>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d{yyyy/MM/dd HH:mm:ss.SSS} %p [%c] - %m%n"></param>
+        </layout>
+    </appender>
+
+    <logger name="org.apache.http.impl.client.DefaultHttpClient">
+        <level value="INFO" />
+        <appender-ref ref="fileLog" />
+    </logger>
+    
+    <root>
+        <level value="info" />
+        <appender-ref ref="stdout" />
+        <!--<appender-ref ref="refreshCacheLog" />-->
+        <appender-ref ref="fileLog" />
+    </root>
+
+</log4j:configuration>  
