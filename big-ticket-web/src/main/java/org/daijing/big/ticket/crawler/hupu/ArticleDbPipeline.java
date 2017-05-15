@@ -3,6 +3,7 @@ package org.daijing.big.ticket.crawler.hupu;
 import org.apache.http.annotation.ThreadSafe;
 import org.daijing.big.ticket.dao.hupu.mapper.VoteArticleMapper;
 import org.daijing.big.ticket.dao.hupu.po.VoteArticlePO;
+import org.daijing.big.ticket.enums.HupuPageTypeEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -34,6 +36,24 @@ public class ArticleDbPipeline implements Pipeline {
 
     @Override
     public void process(ResultItems resultItems, Task task) {
+        DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        //如果是帖子详情页
+        Integer type = resultItems.get("type");
+        if (type.equals(HupuPageTypeEnum.POST_PAGE.getType())) {
+            Integer articleId = Integer.parseInt(resultItems.get("id").toString());
+            Date publishTime;
+            try {
+                publishTime = sdf.parse(resultItems.get("publishTime").toString() + ":00");
+            } catch (ParseException e) {
+                logger.error("解析发表时间异常, articleId=" + articleId, e);
+                return;
+            }
+            VoteArticlePO po = new VoteArticlePO();
+            po.setArticleId(articleId);
+            po.setPublishTime(publishTime);
+            voteArticleMapper.addPublishTime(po);
+            return;
+        }
         List<String> idList = resultItems.get("idList");
         List<String> titleList = resultItems.get("titleList");
         List<String> hrefList = resultItems.get("hrefList");
@@ -44,7 +64,6 @@ public class ArticleDbPipeline implements Pipeline {
         List<VoteArticlePO> list = new ArrayList<VoteArticlePO>(idList.size());
         try {
             HupuListPagePipeLine.handleReplyTimeFormat(lastReplyTimeList);
-            DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             VoteArticlePO po;
             for (int index = 0; index <= titleList.size() - 1; index ++) {
                 po = new VoteArticlePO();

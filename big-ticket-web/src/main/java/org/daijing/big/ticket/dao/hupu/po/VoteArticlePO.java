@@ -29,6 +29,9 @@ public class VoteArticlePO {
     private Integer pageViewCount;
     @Getter
     @Setter
+    private Date publishTime;
+    @Getter
+    @Setter
     private Date lastReplyTime;
     @Getter
     @Setter
@@ -43,6 +46,7 @@ public class VoteArticlePO {
                 ", link='" + link + '\'' +
                 ", replyCount=" + replyCount +
                 ", pageViewCount=" + pageViewCount +
+                ", publishTime=" + publishTime +
                 ", lastReplyTime=" + lastReplyTime +
                 ", gmtCreate=" + gmtCreate +
                 '}';

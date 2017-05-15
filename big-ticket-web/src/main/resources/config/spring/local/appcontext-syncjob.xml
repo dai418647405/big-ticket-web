@@ -10,7 +10,7 @@
     <bean id="crawler" class="org.daijing.big.ticket.crawler.hupu.ArticleListPageProcessor" />
 
     <task:scheduled-tasks>
-        <task:scheduled ref="crawler" method="schedule" cron="0 0/3 * * * ?" />
+        <task:scheduled ref="crawler" method="schedule" cron="0 0/15 * * * ?" />
     </task:scheduled-tasks>
 
 </beans>

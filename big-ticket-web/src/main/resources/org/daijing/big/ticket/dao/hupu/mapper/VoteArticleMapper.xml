@@ -9,13 +9,14 @@
         <result column="link" property="link" jdbcType="VARCHAR" />
         <result column="reply_count" property="replyCount" jdbcType="INTEGER" />
         <result column="page_view_count" property="pageViewCount" jdbcType="INTEGER" />
+        <result column="publish_time" property="publishTime" jdbcType="TIMESTAMP" />
         <result column="last_reply_time" property="lastReplyTime" jdbcType="TIMESTAMP" />
         <result column="gmt_create" property="gmtCreate" jdbcType="TIMESTAMP" />
         <result column="gmt_modified" property="gmtModified" jdbcType="TIMESTAMP" />
     </resultMap>
 
     <sql id="Base_Column_List" >
-        article_id, title, link, reply_count, page_view_count, last_reply_time, gmt_create
+        article_id, title, link, reply_count, page_view_count, publish_time, last_reply_time, gmt_create
     </sql>
 
     <insert id="add">
@@ -27,7 +28,7 @@
         INSERT INTO vote_article(<include refid="Base_Column_List"/> )
         VALUES
         <foreach collection="list" item="item" separator=",">
-            (#{item.articleId}, #{item.title}, #{item.link}, #{item.replyCount}, #{item.pageViewCount}, #{item.lastReplyTime}, now())
+            (#{item.articleId}, #{item.title}, #{item.link}, #{item.replyCount}, #{item.pageViewCount}, #{item.publishTime}, #{item.lastReplyTime}, now())
         </foreach>
         ON duplicate KEY UPDATE
         title = VALUES(title),
@@ -37,4 +38,10 @@
         last_reply_time = VALUES(last_reply_time)
     </insert>
 
+    <insert id="addPublishTime" parameterType="org.daijing.big.ticket.dao.hupu.po.VoteArticlePO">
+        INSERT INTO vote_article(article_id, title, link, publish_time)
+        VALUES (#{po.articleId}, 'placeholder', 'placeholder',  #{po.publishTime})
+        ON duplicate KEY UPDATE
+        publish_time = VALUES(publish_time)
+    </insert>
 </mapper>

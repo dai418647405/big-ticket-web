@@ -12,4 +12,6 @@ public interface VoteArticleMapper {
     void add();
 
     void batchAdd(@Param("list")List<VoteArticlePO> list);
+
+    void addPublishTime(@Param("po") VoteArticlePO po);
 }
