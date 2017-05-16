@@ -44,4 +44,14 @@
         ON duplicate KEY UPDATE
         publish_time = VALUES(publish_time)
     </insert>
+
+    <insert id="batchAddPublishTime">
+        INSERT INTO vote_article(article_id, title, link, publish_time)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.articleId}, 'placeholder', 'placeholder',  #{item.publishTime})
+        </foreach>
+        ON duplicate KEY UPDATE
+        publish_time = VALUES(publish_time)
+    </insert>
 </mapper>

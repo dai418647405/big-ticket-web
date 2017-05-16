@@ -1,14 +1,14 @@
 package org.daijing.big.ticket.crawler.hupu;
 
 import org.daijing.big.ticket.enums.HupuPageTypeEnum;
-import org.daijing.big.ticket.utils.SpringContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.ResultItems;
 import us.codecraft.webmagic.Site;
 import us.codecraft.webmagic.Spider;
-import us.codecraft.webmagic.pipeline.Pipeline;
 import us.codecraft.webmagic.processor.PageProcessor;
 import us.codecraft.webmagic.selector.Html;
 
@@ -28,6 +28,9 @@ public class ArticleListPageProcessor implements PageProcessor {
     public static final String postPageUrl = "https://bbs.hupu.com/\\d+.html";
     private Pattern postPagePattern;
 
+    @Qualifier("articleDbPipeline")
+    @Autowired
+    private ArticleDbPipeline articleDbPipeline;
 
     public ArticleListPageProcessor() {
         postPagePattern = Pattern.compile(postPageUrl);
@@ -79,13 +82,14 @@ public class ArticleListPageProcessor implements PageProcessor {
     @Override
     public void process(Page page) {
         //详情页处理逻辑
-         Matcher postPageMatcher = postPagePattern.matcher(page.getUrl().toString());
+        Matcher postPageMatcher = postPagePattern.matcher(page.getUrl().toString());
         if (postPageMatcher.matches()) {
             //判断帖子是否还存在
             String publishTime = page.getHtml().css(".author .left .stime", "text").get();
             if (publishTime == null || publishTime.trim().equals("")) {
                 page.setSkip(true);
                 logger.error("not found publish time, url=" + page.getUrl());
+                return;
             }
             page.putField("id", page.getUrl().regex("\\d+").get());
             page.putField("publishTime", publishTime);
@@ -161,11 +165,12 @@ public class ArticleListPageProcessor implements PageProcessor {
 
 
     public void schedule() {
+        logger.error("start...");
         Spider voteSpider = Spider.create(new ArticleListPageProcessor())
                 .addUrl("https://bbs.hupu.com/vote")
 //                .addPipeline(new ConsolePipeline())
 //                .addPipeline(new HupuListPagePipeLine())
-                .addPipeline((Pipeline) SpringContextUtil.getBean("articleDbPipeline"))
+                .addPipeline(articleDbPipeline)
                 .thread(20);
         voteSpider.run();
     }

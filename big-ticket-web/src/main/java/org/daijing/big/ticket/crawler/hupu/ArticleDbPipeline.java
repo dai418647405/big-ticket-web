@@ -19,6 +19,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Created by daijing03 on 17/5/9.
@@ -33,6 +35,12 @@ public class ArticleDbPipeline implements Pipeline {
     private VoteArticleMapper voteArticleMapper;
 
     private Logger logger = LoggerFactory.getLogger(getClass());
+
+    private List<VoteArticlePO> poWithPublishTimeList = new ArrayList<VoteArticlePO>(BATCH_NUM);
+
+    private static final int BATCH_NUM = 100;
+
+    private Lock lock = new ReentrantLock();// 锁对象
 
     @Override
     public void process(ResultItems resultItems, Task task) {
@@ -51,7 +59,17 @@ public class ArticleDbPipeline implements Pipeline {
             VoteArticlePO po = new VoteArticlePO();
             po.setArticleId(articleId);
             po.setPublishTime(publishTime);
-            voteArticleMapper.addPublishTime(po);
+            //锁代码块
+            lock.lock();
+            try {
+                poWithPublishTimeList.add(po);
+                if (poWithPublishTimeList.size() == BATCH_NUM) {
+                    voteArticleMapper.batchAddPublishTime(poWithPublishTimeList);
+                    poWithPublishTimeList.clear();
+                }
+            } finally {
+                lock.unlock();
+            }
             return;
         }
         List<String> idList = resultItems.get("idList");
