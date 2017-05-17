@@ -16,4 +16,8 @@ public interface VoteArticleMapper {
     void addPublishTime(@Param("po") VoteArticlePO po);
 
     void batchAddPublishTime(@Param("list")List<VoteArticlePO> list);
+
+    int getVoteArticleListTotalNum();
+
+    List<VoteArticlePO> getVoteArticleListByPageAndSort(@Param("begin") int begin, @Param("offset") int offset, @Param("sortType") int sortType);
 }

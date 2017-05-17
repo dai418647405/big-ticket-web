@@ -54,4 +54,43 @@
         ON duplicate KEY UPDATE
         publish_time = VALUES(publish_time)
     </insert>
+
+    <select id="getVoteArticleListTotalNum" resultType="int">
+        SELECT COUNT(*)
+        FROM vote_article
+    </select>
+
+    <select id="getVoteArticleListByPageAndSort" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM vote_article
+        <choose>
+            <when test="sortType == 1">
+                ORDER BY last_reply_time DESC
+            </when>
+            <when test="sortType == 2">
+                ORDER BY publish_time DESC
+            </when>
+            <when test="sortType == 3">
+                WHERE publish_time >= CURDATE() ORDER BY page_view_count DESC
+            </when>
+            <when test="sortType == 4">
+                <![CDATA[
+                  WHERE publish_time >=  DATE_SUB(CURDATE(), INTERVAL 3 DAY)
+                  AND publish_time < CURDATE()
+                ]]>
+                ORDER BY page_view_count DESC
+            </when>
+            <when test="sortType == 5">
+                <![CDATA[
+                WHERE publish_time >=  DATE_SUB(CURDATE(), INTERVAL 7 DAY)
+                AND publish_time < CURDATE()
+                ]]>
+                ORDER BY page_view_count DESC
+            </when>
+            <when test="sortType == 6">
+                ORDER BY page_view_count DESC
+            </when>
+        </choose>
+        limit #{begin, jdbcType=INTEGER}, #{offset, jdbcType=INTEGER}
+    </select>
 </mapper>
