@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.daijing.big.ticket.dao.hupu.mapper.BlogArticleMapper" >
+
+    <resultMap id="BaseResultMap" type="org.daijing.big.ticket.dao.hupu.po.BlogArticlePO" >
+        <result column="id" property="id" jdbcType="INTEGER" />
+        <result column="blog_id" property="blogId" jdbcType="INTEGER" />
+        <result column="title" property="title" jdbcType="VARCHAR" />
+        <result column="html_content" property="htmlContent" jdbcType="LONGVARCHAR" />
+        <result column="other_type_content" property="otherTypeContent" jdbcType="LONGVARCHAR" />
+        <result column="author" property="author" jdbcType="VARCHAR" />
+        <result column="tag" property="tag" jdbcType="VARCHAR" />
+        <result column="type" property="type" jdbcType="INTEGER" />
+        <result column="seq" property="seq" jdbcType="INTEGER" />
+        <result column="publish_time" property="publishTime" jdbcType="TIMESTAMP" />
+        <result column="gmt_create" property="gmtCreate" jdbcType="TIMESTAMP" />
+        <result column="gmt_modified" property="gmtModified" jdbcType="TIMESTAMP" />
+    </resultMap>
+
+    <sql id="Base_Column_List" >
+        blog_id, title, html_content, other_type_content, author, tag, type, seq, publish_time, gmt_create
+    </sql>
+
+    <insert id="add" parameterType="org.daijing.big.ticket.dao.hupu.po.BlogArticlePO">
+        INSERT INTO blog_article(<include refid="Base_Column_List"/>)
+        VALUES (#{blogId},#{title},#{htmlContent},#{otherTypeContent},
+        #{author},#{tag},#{type},#{seq},now(),now())
+        <selectKey resultType="int" keyProperty="id">
+            SELECT @@IDENTITY AS id
+        </selectKey>
+        ON duplicate KEY UPDATE
+        title = VALUES(title),
+        html_content = VALUES(html_content),
+        other_type_content = VALUES(other_type_content),
+        author = VALUES(author),
+        tag = VALUES(tag),
+        type = VALUES(type),
+        seq = VALUES(seq)
+    </insert>
+
+    <update id="update" parameterType="org.daijing.big.ticket.dao.hupu.po.BlogArticlePO">
+        UPDATE blog_article
+        <set>
+        <if test="po.blogId != null">
+            blog_id = #{po.blogId},
+        </if>
+        <if test="po.title != null">
+            title = #{po.title},
+        </if>
+        <if test="po.htmlContent != null">
+            html_content = #{po.htmlContent},
+        </if>
+        <if test="po.otherTypeContent != null">
+            other_type_content = #{po.otherTypeContent},
+        </if>
+        <if test="po.author != null">
+            author = #{po.author},
+        </if>
+        <if test="po.tag != null">
+            tag = #{po.tag},
+        </if>
+        <if test="po.type != null">
+            type = #{po.type},
+        </if>
+        <if test="po.seq != null">
+            seq = #{po.seq},
+        </if>
+        <if test="po.publishTime != null">
+            publish_time = #{po.publishTime},
+        </if>
+        </set>
+        WHERE id = #{po.id}
+    </update>
+
+    <select id="getBlogByBlogId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM blog_article
+        WHERE blog_id = #{blogId}
+    </select>
+
+    <select id="getAllIdAndTitle" resultMap="BaseResultMap">
+        SELECT blog_id, title, type
+        FROM blog_article
+        ORDER BY seq ASC
+    </select>
+</mapper>
