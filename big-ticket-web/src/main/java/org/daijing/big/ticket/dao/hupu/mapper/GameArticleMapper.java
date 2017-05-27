@@ -6,9 +6,9 @@ import org.daijing.big.ticket.dao.hupu.po.ListRecordPO;
 import java.util.List;
 
 /**
- * Created by daijing03 on 17/5/9.
+ * Created by daijing03 on 17/5/26.
  */
-public interface VoteArticleMapper {
+public interface GameArticleMapper {
     void batchAdd(@Param("list")List<ListRecordPO> list);
 
     void addPublishTime(@Param("po") ListRecordPO po);

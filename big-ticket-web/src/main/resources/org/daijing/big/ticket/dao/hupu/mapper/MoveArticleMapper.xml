@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="org.daijing.big.ticket.dao.hupu.mapper.VoteArticleMapper" >
+<mapper namespace="org.daijing.big.ticket.dao.hupu.mapper.MovieArticleMapper" >
 
     <resultMap id="BaseResultMap" type="org.daijing.big.ticket.dao.hupu.po.ListRecordPO" >
         <result column="id" property="id" jdbcType="INTEGER" />
@@ -20,7 +20,7 @@
     </sql>
 
     <insert id="batchAdd">
-        INSERT INTO vote_article(<include refid="Base_Column_List"/> )
+        INSERT INTO movie_article(<include refid="Base_Column_List"/> )
         VALUES
         <foreach collection="list" item="item" separator=",">
             (#{item.articleId}, #{item.title}, #{item.link}, #{item.replyCount}, #{item.pageViewCount}, #{item.publishTime}, #{item.lastReplyTime}, now())
@@ -34,14 +34,14 @@
     </insert>
 
     <insert id="addPublishTime" parameterType="org.daijing.big.ticket.dao.hupu.po.ListRecordPO">
-        INSERT INTO vote_article(article_id, title, link, publish_time)
+        INSERT INTO movie_article(article_id, title, link, publish_time)
         VALUES (#{po.articleId}, 'placeholder', 'placeholder',  #{po.publishTime})
         ON duplicate KEY UPDATE
         publish_time = VALUES(publish_time)
     </insert>
 
     <insert id="batchAddPublishTime">
-        INSERT INTO vote_article(article_id, title, link, publish_time)
+        INSERT INTO movie_article(article_id, title, link, publish_time)
         VALUES
         <foreach collection="list" item="item" separator=",">
             (#{item.articleId}, 'placeholder', 'placeholder',  #{item.publishTime})
@@ -52,12 +52,12 @@
 
     <select id="getListTotalNum" resultType="int">
         SELECT COUNT(*)
-        FROM vote_article
+        FROM movie_article
     </select>
 
     <select id="getListByPageAndSort" resultMap="BaseResultMap">
         SELECT <include refid="Base_Column_List"/>
-        FROM vote_article
+        FROM movie_article
         <choose>
             <when test="sortType == 1">
                 ORDER BY last_reply_time DESC

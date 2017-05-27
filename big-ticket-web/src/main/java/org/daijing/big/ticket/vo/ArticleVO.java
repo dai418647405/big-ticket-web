@@ -8,7 +8,7 @@ import java.util.Date;
 /**湿乎乎话题列表记录
  * Created by daijing03 on 17/5/16.
  */
-public class VoteArticleVO {
+public class ArticleVO {
     @Getter
     @Setter
     private Integer articleId;
@@ -33,7 +33,7 @@ public class VoteArticleVO {
 
     @Override
     public String toString() {
-        return "VoteArticleVO{" +
+        return "ArticleVO{" +
                 "articleId=" + articleId +
                 ", title='" + title + '\'' +
                 ", link='" + link + '\'' +

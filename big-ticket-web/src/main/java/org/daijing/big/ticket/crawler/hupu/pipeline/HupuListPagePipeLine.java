@@ -1,4 +1,4 @@
-package org.daijing.big.ticket.crawler.hupu;
+package org.daijing.big.ticket.crawler.hupu.pipeline;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.http.annotation.ThreadSafe;

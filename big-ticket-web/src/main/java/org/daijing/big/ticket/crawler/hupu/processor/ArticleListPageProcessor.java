@@ -1,14 +1,13 @@
-package org.daijing.big.ticket.crawler.hupu;
+package org.daijing.big.ticket.crawler.hupu.processor;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.daijing.big.ticket.enums.HupuPageTypeEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.ResultItems;
 import us.codecraft.webmagic.Site;
-import us.codecraft.webmagic.Spider;
 import us.codecraft.webmagic.processor.PageProcessor;
 import us.codecraft.webmagic.selector.Html;
 
@@ -25,15 +24,28 @@ public class ArticleListPageProcessor implements PageProcessor {
 
     private Logger logger = LoggerFactory.getLogger(ArticleListPageProcessor.class);
 
-    public static final String postPageUrl = "https://bbs.hupu.com/\\d+.html";
+    public static final String postPageUrl = "https?://bbs.hupu.com/\\d+.html";
+    public static final String number = "\\d+";
+
     private Pattern postPagePattern;
 
-    @Qualifier("articleDbPipeline")
-    @Autowired
-    private ArticleDbPipeline articleDbPipeline;
+    private Pattern numberPattern;
+
+    @Getter
+    @Setter
+    private String topicName;
+
+    @Getter
+    @Setter
+    private Integer topicId;
+
+    @Getter
+    @Setter
+    private Integer limitPageNumber;
 
     public ArticleListPageProcessor() {
         postPagePattern = Pattern.compile(postPageUrl);
+        numberPattern = Pattern.compile(number);
     }
 
     // 部分一：抓取网站的相关配置，包括编码、抓取间隔、重试次数等
@@ -93,10 +105,10 @@ public class ArticleListPageProcessor implements PageProcessor {
             }
             page.putField("id", page.getUrl().regex("\\d+").get());
             page.putField("publishTime", publishTime);
-            page.putField("type", HupuPageTypeEnum.POST_PAGE.getType());
+            page.putField("pageType", HupuPageTypeEnum.POST_PAGE.getType());
+            page.putField("topicId", topicId);
             return;
         }
-        logger.error("+1");
         //获取是否跳过该页面标志位
         ResultItems resultItems;
         try {
@@ -145,12 +157,16 @@ public class ArticleListPageProcessor implements PageProcessor {
             page.putField("replyCountList", replyCountList);
             page.putField("pageViewCountList", pageViewCountList);
             page.putField("lastReplyTimeList", lastReplyTimeList);
-            page.putField("type", HupuPageTypeEnum.SHI_HU_HU_LIST_PAGE.getType());
+            page.putField("pageType", HupuPageTypeEnum.LIST_PAGE.getType());
+            page.putField("topicId", topicId);
         }
 
         // 部分三：从页面发现后续的url地址来抓取
         //列表页
-        List<String> postListUrls = page.getHtml().css("div.page").links().regex(".*/vote(-\\d)?.*", 0).all();
+        List<String> postListUrls = page.getHtml().css("div.page").links().regex(".*/" + topicName + "(-\\d)?.*", 0).all();
+        if (limitPageNumber > 0) {
+            postListUrls = getLimitedPageUrls(postListUrls);
+        }
         page.addTargetRequests(postListUrls);
         //详情页
         if (hrefList != null && !hrefList.isEmpty()) {
@@ -163,15 +179,24 @@ public class ArticleListPageProcessor implements PageProcessor {
         return site;
     }
 
-
-    public void schedule() {
-        logger.error("start...");
-        Spider voteSpider = Spider.create(new ArticleListPageProcessor())
-                .addUrl("https://bbs.hupu.com/vote")
-//                .addPipeline(new ConsolePipeline())
-//                .addPipeline(new HupuListPagePipeLine())
-                .addPipeline(articleDbPipeline)
-                .thread(20);
-        voteSpider.run();
+    public List<String> getLimitedPageUrls(List<String> urls) {
+        if (urls == null || urls.isEmpty()) {
+            return new ArrayList<String>(0);
+        }
+        List<String> limitedPageUrls = new ArrayList<String>(urls.size());
+        int pageNumber = 0;
+        String pageNumberStr = null;
+        for (String url : urls) {
+            Matcher matcher = numberPattern.matcher(url);
+            if (matcher.find()) {
+                pageNumberStr = matcher.group();
+            }
+            pageNumber = Integer.parseInt(pageNumberStr != null && !pageNumberStr.equals("") ? pageNumberStr : "0");
+            if (pageNumber <= limitPageNumber) {
+                limitedPageUrls.add(url);
+            }
+        }
+        return limitedPageUrls;
     }
+
 }

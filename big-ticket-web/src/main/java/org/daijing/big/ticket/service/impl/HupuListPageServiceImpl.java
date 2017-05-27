@@ -1,12 +1,12 @@
 package org.daijing.big.ticket.service.impl;
 
-import org.daijing.big.ticket.dao.hupu.mapper.VoteArticleMapper;
-import org.daijing.big.ticket.dao.hupu.po.VoteArticlePO;
+import org.daijing.big.ticket.dao.hupu.mapper.*;
+import org.daijing.big.ticket.dao.hupu.po.ListRecordPO;
 import org.daijing.big.ticket.enums.TopicEnum;
 import org.daijing.big.ticket.service.HupuListPageService;
+import org.daijing.big.ticket.vo.ArticleVO;
 import org.daijing.big.ticket.vo.PageModelVO;
 import org.daijing.big.ticket.vo.PaginationVO;
-import org.daijing.big.ticket.vo.VoteArticleVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -26,33 +26,35 @@ public class HupuListPageServiceImpl implements HupuListPageService {
 
     @Autowired
     private VoteArticleMapper voteArticleMapper;
+    @Autowired
+    private AcgArticleMapper acgArticleMapper;
+    @Autowired
+    private FootBallArticleMapper footBallArticleMapper;
+    @Autowired
+    private GameArticleMapper gameArticleMapper;
+    @Autowired
+    private MovieArticleMapper movieArticleMapper;
+    @Autowired
+    private WalkingStreetArticleMapper walkingStreetArticleMapper;
 
     @Override
-    public PageModelVO<VoteArticleVO> getListPage(Integer topicId, Integer sortType, PaginationVO pager) {
+    public PageModelVO<ArticleVO> getListPage(Integer topicId, Integer sortType, PaginationVO pager) {
         if (topicId == null || sortType == null || pager == null
                 || pager.getCurrent() == null || pager.getPageSize() == null || pager.getTotal() == null) {
             throw new IllegalArgumentException("必填参数不能为空");
         }
-        TopicEnum topicEnum = TopicEnum.getTopicEnumById(topicId);
-        switch (topicEnum) {
-            case SHI_HU_HU : return this.getShiHuHuPostList(sortType, pager);
-            default : return this.getShiHuHuPostList(sortType, pager);
-        }
-    }
-
-    private PageModelVO<VoteArticleVO> getShiHuHuPostList(Integer sortType, PaginationVO pager) {
-        PageModelVO<VoteArticleVO> pageModelVO = new PageModelVO<VoteArticleVO>();
+        PageModelVO<ArticleVO> pageModelVO = new PageModelVO<ArticleVO>();
         //如果是第一页,赋总数
         if (pager.getCurrent() == 1) {
-            pager.setTotal(voteArticleMapper.getVoteArticleListTotalNum());
+            pager.setTotal(this.getListTotalNum(topicId));
         }
         //分页查询
         int begin = this.getBegin(pager.getCurrent(), pager.getPageSize());
-        List<VoteArticlePO> poList = voteArticleMapper.getVoteArticleListByPageAndSort(begin, pager.getPageSize(), sortType);
-        List<VoteArticleVO> voList = new ArrayList<VoteArticleVO>(poList.size());
-        VoteArticleVO vo;
-        for (VoteArticlePO po : poList) {
-            vo = new VoteArticleVO();
+        List<ListRecordPO> poList = this.getListByPageAndSort(topicId, begin, pager.getPageSize(), sortType);
+        List<ArticleVO> voList = new ArrayList<ArticleVO>(poList.size());
+        ArticleVO vo;
+        for (ListRecordPO po : poList) {
+            vo = new ArticleVO();
             BeanUtils.copyProperties(po, vo);
             voList.add(vo);
         }
@@ -65,4 +67,33 @@ public class HupuListPageServiceImpl implements HupuListPageService {
     private int getBegin(int current, int pageSize) {
         return (current - 1) * pageSize;
     }
+
+    private int getListTotalNum(int topicId) {
+        TopicEnum topicEnum = TopicEnum.getTopicEnumById(topicId);
+        switch (topicEnum) {
+            case SHI_HU_HU : return voteArticleMapper.getListTotalNum();
+            case WALKING_STREET : return walkingStreetArticleMapper.getListTotalNum();
+            case FOOTBALL : return footBallArticleMapper.getListTotalNum();
+            case MOVIE : return movieArticleMapper.getListTotalNum();
+            case GAME : return gameArticleMapper.getListTotalNum();
+            case ACG : return acgArticleMapper.getListTotalNum();
+            default : return 200;
+        }
+    }
+
+    private List<ListRecordPO> getListByPageAndSort(int topicId, int begin, int offset, int sortType) {
+        TopicEnum topicEnum = TopicEnum.getTopicEnumById(topicId);
+        switch (topicEnum) {
+            case SHI_HU_HU : return voteArticleMapper.getListByPageAndSort(begin, offset, sortType);
+            case WALKING_STREET : return walkingStreetArticleMapper.getListByPageAndSort(begin, offset, sortType);
+            case FOOTBALL : return footBallArticleMapper.getListByPageAndSort(begin, offset, sortType);
+            case MOVIE : return movieArticleMapper.getListByPageAndSort(begin, offset, sortType);
+            case GAME : return gameArticleMapper.getListByPageAndSort(begin, offset, sortType);
+            case ACG : return acgArticleMapper.getListByPageAndSort(begin, offset, sortType);
+            default : return new ArrayList<ListRecordPO>(0);
+        }
+    }
+
+
+
 }

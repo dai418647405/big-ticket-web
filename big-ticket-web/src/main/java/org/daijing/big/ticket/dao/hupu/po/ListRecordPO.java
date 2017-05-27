@@ -8,7 +8,7 @@ import java.util.Date;
 /**
  * Created by daijing03 on 17/5/9.
  */
-public class VoteArticlePO {
+public class ListRecordPO {
     @Getter
     @Setter
     private Integer id;
@@ -39,7 +39,7 @@ public class VoteArticlePO {
 
     @Override
     public String toString() {
-        return "VoteArticlePO{" +
+        return "ListRecordPO{" +
                 "id=" + id +
                 ", articleId=" + articleId +
                 ", title='" + title + '\'' +

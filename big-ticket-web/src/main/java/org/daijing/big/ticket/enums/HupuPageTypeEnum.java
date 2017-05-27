@@ -7,7 +7,7 @@ import lombok.Getter;
  */
 public enum HupuPageTypeEnum {
 
-    SHI_HU_HU_LIST_PAGE(1, "湿乎乎话题"), POST_PAGE(2, "文章详情页");
+    LIST_PAGE(1, "列表页"), POST_PAGE(2, "文章详情页");
 
     @Getter
     private int type;

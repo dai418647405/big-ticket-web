@@ -7,10 +7,95 @@
        http://www.springframework.org/schema/task
        http://www.springframework.org/schema/task/spring-task-3.1.xsd">
 
-    <bean id="crawler" class="org.daijing.big.ticket.crawler.hupu.ArticleListPageProcessor" />
+    <bean id="hupuVoteProcessor" class="org.daijing.big.ticket.crawler.hupu.processor.ArticleListPageProcessor">
+        <property name="topicName" value="vote" />
+        <property name="topicId" value="1" />
+    </bean>
+
+    <bean id="hupuVoteSpider" class="org.daijing.big.ticket.crawler.hupu.spider.HupuSpider">
+        <property name="taskName" value="湿乎乎话题区爬虫任务"/>
+        <property name="url" value="http://bbs.hupu.com/vote"/>
+        <property name="threadNum" value="20"/>
+        <property name="processor" ref="hupuVoteProcessor"/>
+        <property name="limitPageNumber" value="30"/>
+    </bean>
+
+    <bean id="walkingStreetProcessor" class="org.daijing.big.ticket.crawler.hupu.processor.ArticleListPageProcessor">
+        <property name="topicName" value="bxj" />
+        <property name="topicId" value="2" />
+    </bean>
+
+    <bean id="walkingStreetSpider" class="org.daijing.big.ticket.crawler.hupu.spider.HupuSpider">
+        <property name="taskName" value="步行街爬虫任务"/>
+        <property name="url" value="http://bbs.hupu.com/bxj"/>
+        <property name="threadNum" value="20"/>
+        <property name="processor" ref="walkingStreetProcessor"/>
+        <property name="limitPageNumber" value="30"/>
+    </bean>
+
+    <bean id="footBallProcessor" class="org.daijing.big.ticket.crawler.hupu.processor.ArticleListPageProcessor">
+        <property name="topicName" value="topic" />
+        <property name="topicId" value="3" />
+    </bean>
+
+    <bean id="footBallSpider" class="org.daijing.big.ticket.crawler.hupu.spider.HupuSpider">
+        <property name="taskName" value="足球区爬虫任务"/>
+        <property name="url" value="http://bbs.hupu.com/topic"/>
+        <property name="threadNum" value="5"/>
+        <property name="processor" ref="footBallProcessor"/>
+        <property name="limitPageNumber" value="10"/>
+    </bean>
+
+    <bean id="movieProcessor" class="org.daijing.big.ticket.crawler.hupu.processor.ArticleListPageProcessor">
+        <property name="topicName" value="ent" />
+        <property name="topicId" value="4" />
+    </bean>
+
+    <bean id="movieSpider" class="org.daijing.big.ticket.crawler.hupu.spider.HupuSpider">
+        <property name="taskName" value="影视区爬虫任务"/>
+        <property name="url" value="http://bbs.hupu.com/ent"/>
+        <property name="threadNum" value="5"/>
+        <property name="processor" ref="movieProcessor"/>
+        <property name="limitPageNumber" value="10"/>
+    </bean>
+
+    <bean id="gameProcessor" class="org.daijing.big.ticket.crawler.hupu.processor.ArticleListPageProcessor">
+        <property name="topicName" value="game" />
+        <property name="topicId" value="5" />
+    </bean>
+
+    <bean id="gameSpider" class="org.daijing.big.ticket.crawler.hupu.spider.HupuSpider">
+        <property name="taskName" value="电竞区爬虫任务"/>
+        <property name="url" value="http://bbs.hupu.com/game"/>
+        <property name="threadNum" value="5"/>
+        <property name="processor" ref="gameProcessor"/>
+        <property name="limitPageNumber" value="10"/>
+    </bean>
+
+    <bean id="acgProcessor" class="org.daijing.big.ticket.crawler.hupu.processor.ArticleListPageProcessor">
+        <property name="topicName" value="acg" />
+        <property name="topicId" value="6" />
+    </bean>
+
+    <bean id="acgSpider" class="org.daijing.big.ticket.crawler.hupu.spider.HupuSpider">
+        <property name="taskName" value="ACG区爬虫任务"/>
+        <property name="url" value="http://bbs.hupu.com/acg"/>
+        <property name="threadNum" value="5"/>
+        <property name="processor" ref="acgProcessor"/>
+        <property name="limitPageNumber" value="10"/>
+    </bean>
 
     <task:scheduled-tasks>
-        <task:scheduled ref="crawler" method="schedule" cron="0 0/15 * * * ?" />
+        <task:scheduled ref="hupuVoteSpider" method="schedule" cron="0 0/12 * * * ?" />
+        <task:scheduled ref="walkingStreetSpider" method="schedule" cron="0 0/12 * * * ?" />
+        <task:scheduled ref="footBallSpider" method="schedule" cron="0 0/12 * * * ?" />
+        <task:scheduled ref="movieSpider" method="schedule" cron="0 0/12 * * * ?" />
+        <task:scheduled ref="gameSpider" method="schedule" cron="0 0/12 * * * ?" />
+        <task:scheduled ref="acgSpider" method="schedule" cron="0 0/12 * * * ?" />
     </task:scheduled-tasks>
+
+    <!-- 缺省的异步任务线程池 -->
+    <task:annotation-driven executor="asyncExecutor" />
+    <task:executor id="asyncExecutor" pool-size="100-10000" queue-capacity="10" />
 
 </beans>
