@@ -27,6 +27,10 @@
     <mvc:annotation-driven />
     <mvc:default-servlet-handler />
 
+    <!-- 处理静态资源, 如 css, js, fonts, images 等等 -->
+    <mvc:resources mapping="/dist/**" location="/dist/"/>
+    <mvc:resources mapping="/img/**" location="/img/"/>
+
     <!-- 配置视图解析器，将ModelAndView及字符串解析为具体的页面 -->
     <bean
             class="org.springframework.web.servlet.view.InternalResourceViewResolver"
