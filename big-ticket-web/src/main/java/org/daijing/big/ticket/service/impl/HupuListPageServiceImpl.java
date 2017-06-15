@@ -37,6 +37,8 @@ public class HupuListPageServiceImpl implements HupuListPageService {
     @Autowired
     private WalkingStreetArticleMapper walkingStreetArticleMapper;
 
+    private static final int maxTotalNum = 1500;
+
     @Override
     public PageModelVO<ArticleVO> getListPage(Integer topicId, Integer sortType, PaginationVO pager) {
         if (topicId == null || sortType == null || pager == null
@@ -45,8 +47,9 @@ public class HupuListPageServiceImpl implements HupuListPageService {
         }
         PageModelVO<ArticleVO> pageModelVO = new PageModelVO<ArticleVO>();
         //如果是第一页,赋总数
+        int listTotalNum;
         if (pager.getCurrent() == 1) {
-            pager.setTotal(this.getListTotalNum(topicId));
+            pager.setTotal((listTotalNum = this.getListTotalNum(topicId)) > maxTotalNum ? maxTotalNum : listTotalNum);
         }
         //分页查询
         int begin = this.getBegin(pager.getCurrent(), pager.getPageSize());

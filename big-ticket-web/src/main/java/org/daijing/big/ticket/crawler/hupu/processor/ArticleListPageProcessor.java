@@ -26,10 +26,16 @@ public class ArticleListPageProcessor implements PageProcessor {
 
     public static final String postPageUrl = "https?://bbs.hupu.com/\\d+.html";
     public static final String number = "\\d+";
+    public static final String postfix = "/\\d+.html";
+    public static final String domain = "http://bbs.hupu.com";
 
+
+    //帖子页正则
     private Pattern postPagePattern;
-
+    //数字正则
     private Pattern numberPattern;
+    //帖子页不包含域名正则
+    private Pattern postfixPattern;
 
     @Getter
     @Setter
@@ -46,10 +52,11 @@ public class ArticleListPageProcessor implements PageProcessor {
     public ArticleListPageProcessor() {
         postPagePattern = Pattern.compile(postPageUrl);
         numberPattern = Pattern.compile(number);
+        postfixPattern = Pattern.compile(postfix);
     }
 
     // 部分一：抓取网站的相关配置，包括编码、抓取间隔、重试次数等
-    private Site site = Site.me().setCycleRetryTimes(5).setRetryTimes(5).setSleepTime(500).setTimeOut(3 * 60 * 1000)
+    private Site site = Site.me().setCycleRetryTimes(5).setRetryTimes(5).setSleepTime(1000).setTimeOut(3 * 60 * 1000)
             .setUserAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36")
             .addHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
             .addHeader("Accept-Language", "zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3")
@@ -120,6 +127,11 @@ public class ArticleListPageProcessor implements PageProcessor {
             page.putField("idList", idList);
             page.putField("titleList", titleList);
             page.putField("hrefList", hrefList);
+            for (int index = 0; index <= hrefList.size() - 1; index ++) {
+                if (postfixPattern.matcher(hrefList.get(index)).matches()) {
+                    hrefList.set(index, domain + hrefList.get(index));
+                }
+            }
             page.putField("replyCountList", replyCountList);
             page.putField("pageViewCountList", pageViewCountList);
             page.putField("lastReplyTimeList", lastReplyTimeList);

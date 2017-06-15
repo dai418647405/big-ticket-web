@@ -12,7 +12,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <link href="img/easy.ico" rel="shortcut icon">
     <link href="img/easy.ico" rel="apple-touch-icon">
-    <title>easy虎扑|更方便快捷的发倔热点</title>
+    <title>hupuEasy|更方便快捷的发倔热点</title>
     <link href="dist/app.css" rel="stylesheet"></head>
 <body ontouchstart>
 <div id="container"></div>
