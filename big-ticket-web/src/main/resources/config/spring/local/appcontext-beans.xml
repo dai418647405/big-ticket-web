@@ -21,4 +21,5 @@
 
     <bean id="springContextUtil" class="org.daijing.big.ticket.utils.SpringContextUtil"/>
 
+    <bean id="articleMapperFactory" class="org.daijing.big.ticket.utils.ArticleMapperFactory"/>
 </beans>

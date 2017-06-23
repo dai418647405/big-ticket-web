@@ -2,6 +2,9 @@ package org.daijing.big.ticket.enums;
 
 import lombok.Getter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**排序类型枚举
  * Created by daijing03 on 17/5/16.
  */
@@ -18,5 +21,13 @@ public enum SortTypeEnum {
     SortTypeEnum(int type, String desc) {
         this.type = type;
         this.desc = desc;
+    }
+
+    public static List<Integer> getAllSortType() {
+        List<Integer> sortTypeList = new ArrayList<Integer>(values().length);
+        for (SortTypeEnum sortTypeEnum : values()) {
+            sortTypeList.add(sortTypeEnum.getType());
+        }
+        return sortTypeList;
     }
 }

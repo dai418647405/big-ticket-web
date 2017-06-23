@@ -14,7 +14,7 @@
 
     <bean id="hupuVoteSpider" class="org.daijing.big.ticket.crawler.hupu.spider.HupuSpider">
         <property name="taskName" value="湿乎乎话题区爬虫任务"/>
-        <property name="url" value="http://bbs.hupu.com/vote"/>
+        <property name="url" value="https://bbs.hupu.com/vote"/>
         <property name="threadNum" value="20"/>
         <property name="processor" ref="hupuVoteProcessor"/>
         <property name="limitPageNumber" value="30"/>
@@ -27,7 +27,7 @@
 
     <bean id="walkingStreetSpider" class="org.daijing.big.ticket.crawler.hupu.spider.HupuSpider">
         <property name="taskName" value="步行街爬虫任务"/>
-        <property name="url" value="http://bbs.hupu.com/bxj"/>
+        <property name="url" value="https://bbs.hupu.com/bxj"/>
         <property name="threadNum" value="20"/>
         <property name="processor" ref="walkingStreetProcessor"/>
         <property name="limitPageNumber" value="30"/>
@@ -40,7 +40,7 @@
 
     <bean id="footBallSpider" class="org.daijing.big.ticket.crawler.hupu.spider.HupuSpider">
         <property name="taskName" value="足球区爬虫任务"/>
-        <property name="url" value="http://bbs.hupu.com/topic"/>
+        <property name="url" value="https://bbs.hupu.com/topic"/>
         <property name="threadNum" value="5"/>
         <property name="processor" ref="footBallProcessor"/>
         <property name="limitPageNumber" value="10"/>
@@ -53,7 +53,7 @@
 
     <bean id="movieSpider" class="org.daijing.big.ticket.crawler.hupu.spider.HupuSpider">
         <property name="taskName" value="影视区爬虫任务"/>
-        <property name="url" value="http://bbs.hupu.com/ent"/>
+        <property name="url" value="https://bbs.hupu.com/ent"/>
         <property name="threadNum" value="5"/>
         <property name="processor" ref="movieProcessor"/>
         <property name="limitPageNumber" value="10"/>
@@ -66,7 +66,7 @@
 
     <bean id="gameSpider" class="org.daijing.big.ticket.crawler.hupu.spider.HupuSpider">
         <property name="taskName" value="电竞区爬虫任务"/>
-        <property name="url" value="http://bbs.hupu.com/game"/>
+        <property name="url" value="https://bbs.hupu.com/game"/>
         <property name="threadNum" value="5"/>
         <property name="processor" ref="gameProcessor"/>
         <property name="limitPageNumber" value="10"/>
@@ -79,7 +79,7 @@
 
     <bean id="acgSpider" class="org.daijing.big.ticket.crawler.hupu.spider.HupuSpider">
         <property name="taskName" value="ACG区爬虫任务"/>
-        <property name="url" value="http://bbs.hupu.com/acg"/>
+        <property name="url" value="https://bbs.hupu.com/acg"/>
         <property name="threadNum" value="5"/>
         <property name="processor" ref="acgProcessor"/>
         <property name="limitPageNumber" value="10"/>

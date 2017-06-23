@@ -1,9 +1,13 @@
 package org.daijing.big.ticket.service.impl;
 
-import org.daijing.big.ticket.dao.hupu.mapper.*;
+import com.dianping.squirrel.client.StoreKey;
+import org.daijing.big.ticket.dao.hupu.mapper.ArticleMapper;
 import org.daijing.big.ticket.dao.hupu.po.ListRecordPO;
-import org.daijing.big.ticket.enums.TopicEnum;
 import org.daijing.big.ticket.service.HupuListPageService;
+import org.daijing.big.ticket.utils.ArticleMapperFactory;
+import org.daijing.big.ticket.utils.RedisStoreHelper;
+import org.daijing.big.ticket.utils.StoreCallBack;
+import org.daijing.big.ticket.utils.StoreCategory;
 import org.daijing.big.ticket.vo.ArticleVO;
 import org.daijing.big.ticket.vo.PageModelVO;
 import org.daijing.big.ticket.vo.PaginationVO;
@@ -11,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -24,18 +29,9 @@ public class HupuListPageServiceImpl implements HupuListPageService {
 
     private static final Logger logger = LoggerFactory.getLogger(HupuListPageServiceImpl.class);
 
+    @Qualifier("articleMapperFactory")
     @Autowired
-    private VoteArticleMapper voteArticleMapper;
-    @Autowired
-    private AcgArticleMapper acgArticleMapper;
-    @Autowired
-    private FootBallArticleMapper footBallArticleMapper;
-    @Autowired
-    private GameArticleMapper gameArticleMapper;
-    @Autowired
-    private MovieArticleMapper movieArticleMapper;
-    @Autowired
-    private WalkingStreetArticleMapper walkingStreetArticleMapper;
+    private ArticleMapperFactory articleMapperFactory;
 
     private static final int maxTotalNum = 1500;
 
@@ -49,11 +45,13 @@ public class HupuListPageServiceImpl implements HupuListPageService {
         //如果是第一页,赋总数
         int listTotalNum;
         if (pager.getCurrent() == 1) {
-            pager.setTotal((listTotalNum = this.getListTotalNum(topicId)) > maxTotalNum ? maxTotalNum : listTotalNum);
+//            pager.setTotal((listTotalNum = this.getListTotalNum(topicId)) > maxTotalNum ? maxTotalNum : listTotalNum);
+            pager.setTotal(maxTotalNum);
         }
         //分页查询
         int begin = this.getBegin(pager.getCurrent(), pager.getPageSize());
         List<ListRecordPO> poList = this.getListByPageAndSort(topicId, begin, pager.getPageSize(), sortType);
+        //转换
         List<ArticleVO> voList = new ArrayList<ArticleVO>(poList.size());
         ArticleVO vo;
         for (ListRecordPO po : poList) {
@@ -72,31 +70,33 @@ public class HupuListPageServiceImpl implements HupuListPageService {
     }
 
     private int getListTotalNum(int topicId) {
-        TopicEnum topicEnum = TopicEnum.getTopicEnumById(topicId);
-        switch (topicEnum) {
-            case SHI_HU_HU : return voteArticleMapper.getListTotalNum();
-            case WALKING_STREET : return walkingStreetArticleMapper.getListTotalNum();
-            case FOOTBALL : return footBallArticleMapper.getListTotalNum();
-            case MOVIE : return movieArticleMapper.getListTotalNum();
-            case GAME : return gameArticleMapper.getListTotalNum();
-            case ACG : return acgArticleMapper.getListTotalNum();
-            default : return 200;
-        }
-    }
-
-    private List<ListRecordPO> getListByPageAndSort(int topicId, int begin, int offset, int sortType) {
-        TopicEnum topicEnum = TopicEnum.getTopicEnumById(topicId);
-        switch (topicEnum) {
-            case SHI_HU_HU : return voteArticleMapper.getListByPageAndSort(begin, offset, sortType);
-            case WALKING_STREET : return walkingStreetArticleMapper.getListByPageAndSort(begin, offset, sortType);
-            case FOOTBALL : return footBallArticleMapper.getListByPageAndSort(begin, offset, sortType);
-            case MOVIE : return movieArticleMapper.getListByPageAndSort(begin, offset, sortType);
-            case GAME : return gameArticleMapper.getListByPageAndSort(begin, offset, sortType);
-            case ACG : return acgArticleMapper.getListByPageAndSort(begin, offset, sortType);
-            default : return new ArrayList<ListRecordPO>(0);
+        ArticleMapper articleMapper = articleMapperFactory.getArticleMapperByTopicId(topicId);
+        if (articleMapper != null) {
+            return articleMapper.getListTotalNum();
+        } else {
+            return 200;
         }
     }
 
 
+    private List<ListRecordPO> getListByPageAndSort(final int topicId, final int begin, final int offset, final int sortType) {
+        StoreKey cacheKey = new StoreKey(StoreCategory.ARTICLE_LIST_PAGE, topicId, sortType);
+
+        return RedisStoreHelper.getList(cacheKey, new StoreCallBack<List<ListRecordPO>>(){
+            @Override
+            public List<ListRecordPO> getResult(StoreKey missKey) {
+                return getListByPageAndSortFromDB(topicId, begin, offset, sortType);
+            }
+        }, true, begin, begin + offset - 1);
+    }
+
+    private List<ListRecordPO> getListByPageAndSortFromDB(int topicId, int begin, int offset, int sortType) {
+        ArticleMapper articleMapper = articleMapperFactory.getArticleMapperByTopicId(topicId);
+        if (articleMapper != null) {
+            return articleMapper.getListByPageAndSort(begin, offset, sortType);
+        } else {
+            return new ArrayList<ListRecordPO>(0);
+        }
+    }
 
 }

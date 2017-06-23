@@ -5,6 +5,7 @@ import lombok.Setter;
 import org.daijing.big.ticket.crawler.hupu.SpiderScheduler;
 import org.daijing.big.ticket.crawler.hupu.pipeline.ArticleDbPipeline;
 import org.daijing.big.ticket.crawler.hupu.processor.ArticleListPageProcessor;
+import org.daijing.big.ticket.service.CacheRefreshService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +52,10 @@ public class HupuSpider implements SpiderScheduler {
     @Qualifier("articleDbPipeline")
     @Autowired
     private ArticleDbPipeline articleDbPipeline;
+
+    @Qualifier("cacheRefreshServiceImpl")
+    @Autowired
+    private CacheRefreshService cacheRefreshService;
 
     @Getter
     @Setter
@@ -139,6 +144,8 @@ public class HupuSpider implements SpiderScheduler {
                 .thread(threadNum)
                 .setDownloader(httpClientDownloader);
         voteSpider.run();
+        Integer topicId = ((ArticleListPageProcessor) processor).getTopicId();
+        cacheRefreshService.syncDB2RedisByTopic(topicId, 1500);
     }
 
 }

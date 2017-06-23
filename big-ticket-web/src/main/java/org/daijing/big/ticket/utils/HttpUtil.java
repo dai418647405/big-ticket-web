@@ -14,7 +14,8 @@ import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +30,7 @@ import java.util.Map;
 
 public class HttpUtil {
 
-    private static final Logger logger = Logger.getLogger(HttpUtil.class);
+    private static final Logger logger = LoggerFactory.getLogger(HttpUtil.class);
     private static String CHARSET = "UTF-8";
     private static final String APPLICATION_JSON = "application/json";
 
@@ -60,7 +61,7 @@ public class HttpUtil {
                 responseText = EntityUtils.toString(entity);
             }
         } catch (Exception e) {
-            logger.error(e);
+            logger.error("get error", e);
         } finally {
             try {
                 if (null != response) {
@@ -78,7 +79,7 @@ public class HttpUtil {
         //210.22.89.58:37278
         final String url = "http://127.0.0.1:8000/sxd/nativeapp/service.html?method=sxdorder.create.sxdorder.info&user_id=47";
         final String json = "{afdsaf:fadsfdsafdsa:fadsfadsfdsf}";
-        
+
 //        System.out.println("final" + " : " + post(url, EncryptUtil.desEncrypt(json,EncryptUtil.SALT_KEY)));
     }
 
@@ -111,18 +112,18 @@ public class HttpUtil {
                 responseText = EntityUtils.toString(entity);
             }
         } catch (Exception e) {
-            logger.error(e);
+            logger.error("post error", e);
         } finally {
             try {
                 response.close();
             } catch (Exception e) {
-                logger.error(e);
+                logger.error("post error", e);
             }
 
             try {
                 client.close();
             } catch (Exception e) {
-                logger.error(e);
+                logger.error("post error", e);
             }
         }
         return responseText;
@@ -130,7 +131,7 @@ public class HttpUtil {
 
     /**
      * 基于HttpClient 4.3的通用POST方法
-     * 
+     *
      * @param url
      *            提交的URL
      * @param paramsMap
@@ -169,12 +170,12 @@ public class HttpUtil {
                 responseText = EntityUtils.toString(entity);
             }
         } catch (Exception e) {
-            logger.error(e);
+            logger.error("post error", e);
         } finally {
             try {
                 response.close();
             } catch (Exception e) {
-                logger.error(e);
+                logger.error("post error", e);
             }
         }
         return responseText;

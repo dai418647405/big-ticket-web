@@ -1,7 +1,8 @@
 package org.daijing.big.ticket.utils;
 
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Map;
@@ -11,7 +12,7 @@ import java.util.TreeMap;
 
 public class WebUtil {
 
-	private static Logger logger = Logger.getLogger(WebUtil.class);
+	private static Logger logger = LoggerFactory.getLogger(WebUtil.class);
 	/**
 	 * 生成签名信息
 	 * @param map
