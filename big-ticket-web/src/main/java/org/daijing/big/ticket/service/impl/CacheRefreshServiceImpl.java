@@ -6,6 +6,7 @@ import org.daijing.big.ticket.enums.SortTypeEnum;
 import org.daijing.big.ticket.enums.TopicEnum;
 import org.daijing.big.ticket.service.CacheRefreshService;
 import org.daijing.big.ticket.utils.ArticleMapperFactory;
+import org.daijing.big.ticket.utils.HupuListPageConstant;
 import org.daijing.big.ticket.utils.RedisStoreHelper;
 import org.daijing.big.ticket.utils.StoreCategory;
 import org.slf4j.Logger;
@@ -28,7 +29,6 @@ public class CacheRefreshServiceImpl implements CacheRefreshService {
     @Autowired
     private ArticleMapperFactory articleMapperFactory;
 
-    private static final int cacheFailedRetryTimes = 3;
 
     @Override
     public boolean syncDB2RedisByTopic(int topicId, int num) {
@@ -41,8 +41,8 @@ public class CacheRefreshServiceImpl implements CacheRefreshService {
         for (Integer sortType : sortTypeList) {
             int times = 1;
             while(!RedisStoreHelper.setList(new StoreKey(StoreCategory.ARTICLE_LIST_PAGE, topicId, sortType), articleMapper.getListByPageAndSort(0, num, sortType))
-                    && times <= cacheFailedRetryTimes) {
-                if (times == cacheFailedRetryTimes) {
+                    && times <= HupuListPageConstant.CACHE_FAILED_RETRY_TIMES) {
+                if (times == HupuListPageConstant.CACHE_FAILED_RETRY_TIMES) {
                     logger.error(String.format("缓存刷新失败%d次, 缓存失败重试已达上限, 刷新缓存失败!", times));
                     return false;
                 }
@@ -50,6 +50,7 @@ public class CacheRefreshServiceImpl implements CacheRefreshService {
                 times ++;
             }
         }
+        logger.info("缓存刷新成功:" + TopicEnum.getTopicEnumById(topicId).getDesc());
         return true;
     }
 }

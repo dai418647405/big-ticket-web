@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static org.daijing.big.ticket.utils.SpiderConstant.*;
+
 /**
  * dj
  */
@@ -56,7 +58,11 @@ public class ArticleListPageProcessor implements PageProcessor {
     }
 
     // 部分一：抓取网站的相关配置，包括编码、抓取间隔、重试次数等
-    private Site site = Site.me().setCycleRetryTimes(5).setRetryTimes(5).setSleepTime(1000).setTimeOut(3 * 60 * 1000)
+    private Site site = Site.me()
+            .setCycleRetryTimes(DOWNLOAD_FAILED_CYCLE_RETRY_TIMES)
+            .setRetryTimes(HTTP_CLIENT_CONN_TIMEOUT_RETRY_TIMES)
+            .setSleepTime(CRAWL_TIME_INTERVAL)
+            .setTimeOut(HTTP_SOCKET_TIME_OUT)
             .setUserAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36")
             .addHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
             .addHeader("Accept-Language", "zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3")
@@ -162,7 +168,7 @@ public class ArticleListPageProcessor implements PageProcessor {
             return new ArrayList<String>(0);
         }
         List<String> limitedPageUrls = new ArrayList<String>(urls.size());
-        int pageNumber = 0;
+        int pageNumber;
         String pageNumberStr = null;
         for (String url : urls) {
             Matcher matcher = numberPattern.matcher(url);

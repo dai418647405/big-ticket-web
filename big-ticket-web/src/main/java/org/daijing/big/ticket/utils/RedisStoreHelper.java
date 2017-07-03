@@ -6,7 +6,10 @@ import com.dianping.squirrel.common.exception.StoreException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.Field;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Future;
 
 /**
@@ -68,22 +71,37 @@ public class RedisStoreHelper<T> {
 
     public static boolean setList(StoreKey cacheKey, List<? extends Object> cacheList) {
         try {
-            storeClient.delete(cacheKey);
+//            storeClient.delete(cacheKey);
+            lDelete(cacheKey);
             if (cacheList == null || cacheList.isEmpty()) {
-                return true;
+                logger.error("缓存值为空");
+                return false;
             }
             Long size = storeClient.rpush(cacheKey, cacheList.toArray());
             if (size.intValue() != cacheList.size()) {
+                logger.error(String.format("成功刷进缓存的list与当前入参数量不一致!成功:%d个,入参:%d个",size.intValue(), cacheList.size()));
                 storeClient.delete(cacheKey);
                 return false;
             } else {
                 return true;
             }
         } catch (Exception e) {
-            logger.error(String.format("setList cache failed. cityId = %d, type = %d",
-                    (Integer)(cacheKey.getParams()[0]), (Integer)(cacheKey.getParams()[1])), e);
+            logger.error("setList cache failed. cacheKey=" + cacheKey.toString(), e);
             return false;
         }
+    }
+
+    private static boolean lDelete(StoreKey cacheKey) {
+        Class fakeRedisClientClass = FakeRedisClient.class;
+        try {
+            Field lmapField = fakeRedisClientClass.getDeclaredField("lmap");
+            lmapField.setAccessible(true);
+            Map<StoreKey, List<Object>> lmap = (HashMap<StoreKey, List<Object>>)lmapField.get(storeClient);
+            lmap.remove(cacheKey);
+        } catch (Exception e) {
+            logger.error("反射获取lmap异常", e);
+        }
+        return true;
     }
 
     public static  int getListLen(StoreKey cacheKey, StoreCallBack<Integer> cacheCallBack, boolean isNullSet){

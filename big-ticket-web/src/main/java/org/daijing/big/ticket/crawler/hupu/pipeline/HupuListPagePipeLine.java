@@ -2,6 +2,7 @@ package org.daijing.big.ticket.crawler.hupu.pipeline;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.http.annotation.ThreadSafe;
+import org.daijing.big.ticket.utils.SpiderUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import us.codecraft.webmagic.ResultItems;
@@ -13,13 +14,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Store results in files.<br>
@@ -55,7 +51,7 @@ public class HupuListPagePipeLine extends FilePersistentBase implements Pipeline
             List<String> replyCountList = resultItems.get("replyCountList");
             List<String> pageViewCountList = resultItems.get("pageViewCountList");
             List<String> lastReplyTimeList = resultItems.get("lastReplyTimeList");
-            handleReplyTimeFormat(lastReplyTimeList);
+            SpiderUtil.handleReplyTimeFormat(lastReplyTimeList);
             for (int index = 0; index <= titleList.size() - 1; index ++) {
                 printWriter.println(idList.get(index) + "\t" + titleList.get(index) + "\t" + hrefList.get(index) + "\t" + replyCountList.get(index) + "\t" + pageViewCountList.get(index) + "\t" + lastReplyTimeList.get(index));
             }
@@ -71,37 +67,5 @@ public class HupuListPagePipeLine extends FilePersistentBase implements Pipeline
         }
     }
 
-    public static void handleReplyTimeFormat(List<String> lastReplyTimeList) throws ParseException {
-        Pattern HHmmPattern = Pattern.compile("\\d+:\\d+");
-        Pattern yyyyMMddPattern = Pattern.compile("\\d+-\\d+-\\d+");
-        Pattern MMddPattern = Pattern.compile("\\d+-\\d+");
 
-        DateFormat yyyyDf = new SimpleDateFormat("yyyy");
-        DateFormat hhMmDf = new SimpleDateFormat("HH:mm");
-        DateFormat yyyyMMddDf = new SimpleDateFormat("yyyy-MM-dd");
-        DateFormat mmDdDf = new SimpleDateFormat("MM-dd");
-        DateFormat standardDf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
-        StringBuilder sb;
-        Matcher matcher;
-        Date now = new Date();
-        int index = 0;
-        for (String replyTime : lastReplyTimeList) {
-            matcher = HHmmPattern.matcher(replyTime);
-            if (matcher.matches()) {
-                sb = new StringBuilder("");
-                replyTime = sb.append(yyyyMMddDf.format(now)).append(" ").append(replyTime).append(":00").toString();
-            }
-            matcher = yyyyMMddPattern.matcher(replyTime);
-            if (matcher.matches()) {
-                replyTime = standardDf.format(yyyyMMddDf.parse(replyTime));
-            }
-            matcher = MMddPattern.matcher(replyTime);
-            if (matcher.matches()) {
-                replyTime = standardDf.format(yyyyMMddDf.parse(yyyyDf.format(now) + "-" + replyTime));
-            }
-            lastReplyTimeList.set(index, replyTime);
-            index ++;
-        }
-    }
 }

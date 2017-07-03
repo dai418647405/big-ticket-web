@@ -6,6 +6,7 @@ import org.daijing.big.ticket.crawler.hupu.SpiderScheduler;
 import org.daijing.big.ticket.crawler.hupu.pipeline.ArticleDbPipeline;
 import org.daijing.big.ticket.crawler.hupu.processor.ArticleListPageProcessor;
 import org.daijing.big.ticket.service.CacheRefreshService;
+import org.daijing.big.ticket.utils.SpiderConstant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,9 +23,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by daijing03 on 17/5/26.
@@ -120,6 +119,44 @@ public class HupuSpider implements SpiderScheduler {
         return true;
     }
 
+    private boolean permitCrawlTime() {
+        BufferedReader crawlTimeBr = null;
+        try {
+            //读取配置值
+            crawlTimeBr = new BufferedReader(new FileReader("/data/appdatas/big-ticket-web/crawl_time.properties"));
+            Properties prop = new Properties();
+            prop.load(crawlTimeBr);
+            String startTimeProp = prop.getProperty("startTime", "00:00");
+            String endTimeProp = prop.getProperty("endTime", "23:59");
+            String startTime1Prop = prop.getProperty("startTime1", "00:00");
+            String endTime1Prop = prop.getProperty("endTime1", "23:59");
+            //格式化时间
+            Date now = new Date();
+            DateFormat df = new SimpleDateFormat("HH:mm");
+            Date startTime = df.parse(startTimeProp);
+            Date endTime = df.parse(endTimeProp);
+            Date startTime1 = df.parse(startTime1Prop);
+            Date endTime1 = df.parse(endTime1Prop);
+            Date curTime = df.parse(df.format(now));
+            return inDateRange(curTime, startTime, endTime) || inDateRange(curTime, startTime1, endTime1);
+        } catch (Exception e) {
+            logger.error("获取允许爬取时间段失败", e);
+        } finally {
+            if (crawlTimeBr != null) {
+                try {
+                    crawlTimeBr.close();
+                } catch (IOException e) {
+                    logger.error("关闭爬取时间段reader异常", e);
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean inDateRange(Date curTime, Date startTime, Date endTime) {
+        return curTime.equals(startTime) || curTime.equals(endTime) || (curTime.after(startTime) && curTime.before(endTime));
+    }
+
     @Async
     @Override
     public void schedule() {
@@ -127,13 +164,24 @@ public class HupuSpider implements SpiderScheduler {
             logger.error("禁止爬取!");
             return;
         }
+        if (!permitCrawlTime()) {
+            logger.error("不在爬取时间段内,禁止爬取");
+            return;
+        }
         this.setProxyProvider();
-        DateFormat df = new SimpleDateFormat("mm");
-        int minutes = Integer.parseInt(df.format(new Date()));
+        DateFormat hourDf = new SimpleDateFormat("HH");
+        DateFormat minuteDf = new SimpleDateFormat("mm");
+        Date now = new Date();
+        int hours = Integer.parseInt(hourDf.format(now));
+        int minutes = Integer.parseInt(minuteDf.format(now));
         ArticleListPageProcessor listPageProcessor = (ArticleListPageProcessor)processor;
-        if (minutes == 0) {
+        //如果是整点4,8,12,16,20,0
+        if (hours % 4 == 0 && minutes == 0) {
             listPageProcessor.setLimitPageNumber(-1);
             logger.info("start 全量爬取 taskName=" + taskName);
+        } else if (hours % 4 == 0 && minutes == 15) {
+            logger.info("在全量爬取的时间点上,15分钟次不执行");
+            return;
         } else {
             listPageProcessor.setLimitPageNumber(limitPageNumber);
             logger.info("start 热点数据爬取 taskName=" + taskName + ",limitPageNumber=" + limitPageNumber);
@@ -145,7 +193,7 @@ public class HupuSpider implements SpiderScheduler {
                 .setDownloader(httpClientDownloader);
         voteSpider.run();
         Integer topicId = ((ArticleListPageProcessor) processor).getTopicId();
-        cacheRefreshService.syncDB2RedisByTopic(topicId, 1500);
+        cacheRefreshService.syncDB2RedisByTopic(topicId, SpiderConstant.TOPIC_SHOW_NUM);
     }
 
 }

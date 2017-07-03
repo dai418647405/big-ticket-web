@@ -5,6 +5,7 @@ import org.daijing.big.ticket.dao.hupu.mapper.BlogTypeMapper;
 import org.daijing.big.ticket.dao.hupu.po.BlogArticlePO;
 import org.daijing.big.ticket.dao.hupu.po.BlogTypePO;
 import org.daijing.big.ticket.service.BlogService;
+import org.daijing.big.ticket.utils.BlogConstant;
 import org.daijing.big.ticket.utils.ValidateUtil;
 import org.daijing.big.ticket.vo.BlogArticleVO;
 import org.daijing.big.ticket.vo.BlogTypeVO;
@@ -32,7 +33,6 @@ public class BlogServiceImpl implements BlogService {
     @Autowired
     private BlogTypeMapper blogTypeMapper;
 
-    private static final int CREATE_NEW = 0;
 
     @Override
     public List<BlogArticleVO> getBlogTitleList() {
@@ -86,7 +86,7 @@ public class BlogServiceImpl implements BlogService {
         }
         BlogArticlePO po = new BlogArticlePO();
         BeanUtils.copyProperties(blog, po);
-        if (po.getBlogId() == CREATE_NEW) {
+        if (po.getBlogId() == BlogConstant.CREATE_NEW) {
             blogArticleMapper.add(po);
             //blogId为自增id
             po.setBlogId(po.getId());

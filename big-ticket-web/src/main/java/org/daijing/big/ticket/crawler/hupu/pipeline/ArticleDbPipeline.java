@@ -5,6 +5,8 @@ import org.daijing.big.ticket.dao.hupu.mapper.*;
 import org.daijing.big.ticket.dao.hupu.po.ListRecordPO;
 import org.daijing.big.ticket.enums.HupuPageTypeEnum;
 import org.daijing.big.ticket.enums.TopicEnum;
+import org.daijing.big.ticket.utils.SpiderConstant;
+import org.daijing.big.ticket.utils.SpiderUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,9 +50,7 @@ public class ArticleDbPipeline implements Pipeline {
     @Autowired
     private WalkingStreetArticleMapper walkingStreetArticleMapper;
 
-    private List<ListRecordPO> poWithPublishTimeList = new ArrayList<ListRecordPO>(BATCH_NUM);
-
-    private static final int BATCH_NUM = 100;
+    private List<ListRecordPO> poWithPublishTimeList = new ArrayList<ListRecordPO>(SpiderConstant.BATCH_NUM);
 
     private Lock lock = new ReentrantLock();// 锁对象
 
@@ -83,7 +83,7 @@ public class ArticleDbPipeline implements Pipeline {
         lock.lock();
         try {
             poWithPublishTimeList.add(po);
-            if (poWithPublishTimeList.size() == BATCH_NUM) {
+            if (poWithPublishTimeList.size() == SpiderConstant.BATCH_NUM) {
                 batchAddPublishTime(topicId);
                 poWithPublishTimeList.clear();
             }
@@ -102,7 +102,7 @@ public class ArticleDbPipeline implements Pipeline {
         List<String> lastReplyTimeList = resultItems.get("lastReplyTimeList");
         List<ListRecordPO> list = new ArrayList<ListRecordPO>(idList.size());
         try {
-            HupuListPagePipeLine.handleReplyTimeFormat(lastReplyTimeList);
+            SpiderUtil.handleReplyTimeFormat(lastReplyTimeList);
             ListRecordPO po;
             for (int index = 0; index <= titleList.size() - 1; index ++) {
                 po = new ListRecordPO();

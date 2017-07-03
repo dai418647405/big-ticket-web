@@ -4,10 +4,7 @@ import com.dianping.squirrel.client.StoreKey;
 import org.daijing.big.ticket.dao.hupu.mapper.ArticleMapper;
 import org.daijing.big.ticket.dao.hupu.po.ListRecordPO;
 import org.daijing.big.ticket.service.HupuListPageService;
-import org.daijing.big.ticket.utils.ArticleMapperFactory;
-import org.daijing.big.ticket.utils.RedisStoreHelper;
-import org.daijing.big.ticket.utils.StoreCallBack;
-import org.daijing.big.ticket.utils.StoreCategory;
+import org.daijing.big.ticket.utils.*;
 import org.daijing.big.ticket.vo.ArticleVO;
 import org.daijing.big.ticket.vo.PageModelVO;
 import org.daijing.big.ticket.vo.PaginationVO;
@@ -33,8 +30,6 @@ public class HupuListPageServiceImpl implements HupuListPageService {
     @Autowired
     private ArticleMapperFactory articleMapperFactory;
 
-    private static final int maxTotalNum = 1500;
-
     @Override
     public PageModelVO<ArticleVO> getListPage(Integer topicId, Integer sortType, PaginationVO pager) {
         if (topicId == null || sortType == null || pager == null
@@ -46,7 +41,7 @@ public class HupuListPageServiceImpl implements HupuListPageService {
         int listTotalNum;
         if (pager.getCurrent() == 1) {
 //            pager.setTotal((listTotalNum = this.getListTotalNum(topicId)) > maxTotalNum ? maxTotalNum : listTotalNum);
-            pager.setTotal(maxTotalNum);
+            pager.setTotal(HupuListPageConstant.TOPIC_SHOW_NUM);
         }
         //分页查询
         int begin = this.getBegin(pager.getCurrent(), pager.getPageSize());
