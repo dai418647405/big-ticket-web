@@ -83,11 +83,11 @@ public class ArticleDbPipeline implements Pipeline {
         lock.lock();
         try {
             poWithPublishTimeList.add(po);
-            if (poWithPublishTimeList.size() == SpiderConstant.BATCH_NUM) {
+            if (poWithPublishTimeList.size() >= SpiderConstant.BATCH_NUM) {
                 batchAddPublishTime(topicId);
+                poWithPublishTimeList.clear();
             }
         } finally {
-            poWithPublishTimeList.clear();
             lock.unlock();
         }
     }
