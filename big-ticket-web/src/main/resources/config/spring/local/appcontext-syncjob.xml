@@ -86,12 +86,12 @@
     </bean>
 
     <task:scheduled-tasks>
-        <task:scheduled ref="hupuVoteSpider" method="schedule" cron="0 0/15 * * * ?" />
-        <task:scheduled ref="walkingStreetSpider" method="schedule" cron="0 0/15 * * * ?" />
-        <task:scheduled ref="footBallSpider" method="schedule" cron="0 0/15 * * * ?" />
-        <task:scheduled ref="movieSpider" method="schedule" cron="0 0/15 * * * ?" />
-        <task:scheduled ref="gameSpider" method="schedule" cron="0 0/15 * * * ?" />
-        <task:scheduled ref="acgSpider" method="schedule" cron="0 0/15 * * * ?" />
+        <task:scheduled ref="hupuVoteSpider" method="schedule" cron="0 0/10 * * * ?" />
+        <task:scheduled ref="walkingStreetSpider" method="schedule" cron="0 0/10 * * * ?" />
+        <task:scheduled ref="footBallSpider" method="schedule" cron="0 0/10 * * * ?" />
+        <task:scheduled ref="movieSpider" method="schedule" cron="0 0/10 * * * ?" />
+        <task:scheduled ref="gameSpider" method="schedule" cron="0 0/10 * * * ?" />
+        <task:scheduled ref="acgSpider" method="schedule" cron="0 0/10 * * * ?" />
     </task:scheduled-tasks>
 
     <!-- 缺省的异步任务线程池 -->

@@ -15,15 +15,15 @@ public class SpiderUtil {
     private static final Pattern HHmmPattern = Pattern.compile("\\d+:\\d+");
     private static final Pattern yyyyMMddPattern = Pattern.compile("\\d+-\\d+-\\d+");
     private static final Pattern MMddPattern = Pattern.compile("\\d+-\\d+");
-    private static final DateFormat yyyyDf = new SimpleDateFormat("yyyy");
-    private static final DateFormat hhMmDf = new SimpleDateFormat("HH:mm");
-    private static final DateFormat yyyyMMddDf = new SimpleDateFormat("yyyy-MM-dd");
-    private static final DateFormat mmDdDf = new SimpleDateFormat("MM-dd");
-    private static final DateFormat standardDf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     private SpiderUtil() {}
 
     public static void handleReplyTimeFormat(List<String> lastReplyTimeList) throws ParseException {
+        DateFormat yyyyDf = new SimpleDateFormat("yyyy");
+        DateFormat hhMmDf = new SimpleDateFormat("HH:mm");
+        DateFormat yyyyMMddDf = new SimpleDateFormat("yyyy-MM-dd");
+        DateFormat mmDdDf = new SimpleDateFormat("MM-dd");
+        DateFormat standardDf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         StringBuilder sb;
         Matcher matcher;
         Date now = new Date();

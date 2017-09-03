@@ -71,16 +71,15 @@ public class RedisStoreHelper<T> {
 
     public static boolean setList(StoreKey cacheKey, List<? extends Object> cacheList) {
         try {
-//            storeClient.delete(cacheKey);
-            lDelete(cacheKey);
             if (cacheList == null || cacheList.isEmpty()) {
                 logger.error("缓存值为空");
                 return false;
             }
+            lDelete(cacheKey);
             Long size = storeClient.rpush(cacheKey, cacheList.toArray());
             if (size.intValue() != cacheList.size()) {
                 logger.error(String.format("成功刷进缓存的list与当前入参数量不一致!成功:%d个,入参:%d个",size.intValue(), cacheList.size()));
-                storeClient.delete(cacheKey);
+                lDelete(cacheKey);
                 return false;
             } else {
                 return true;

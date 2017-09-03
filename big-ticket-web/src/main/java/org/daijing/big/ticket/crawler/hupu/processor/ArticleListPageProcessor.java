@@ -29,6 +29,7 @@ public class ArticleListPageProcessor implements PageProcessor {
     public static final String postPageUrl = "https?://bbs.hupu.com/\\d+.html";
     public static final String number = "\\d+";
     public static final String postfix = "/\\d+.html";
+    public static final String listPageUrl="https?:\\/\\/bbs\\.hupu\\.com\\/\\w*";
     public static final String domain = "http://bbs.hupu.com";
 
 
@@ -38,6 +39,8 @@ public class ArticleListPageProcessor implements PageProcessor {
     private Pattern numberPattern;
     //帖子页不包含域名正则
     private Pattern postfixPattern;
+    //列表首页正则 https://bbs.hupu.com/vote
+    private Pattern listHeadPagePattern;
 
     @Getter
     @Setter
@@ -55,6 +58,7 @@ public class ArticleListPageProcessor implements PageProcessor {
         postPagePattern = Pattern.compile(postPageUrl);
         numberPattern = Pattern.compile(number);
         postfixPattern = Pattern.compile(postfix);
+        listHeadPagePattern = Pattern.compile(listPageUrl);
     }
 
     // 部分一：抓取网站的相关配置，包括编码、抓取间隔、重试次数等
@@ -100,11 +104,16 @@ public class ArticleListPageProcessor implements PageProcessor {
         }
         // 部分二：定义如何抽取页面信息，并保存下来
         Html html = page.getHtml();
-        List<String> idList = html.css("#pl tr", "mid").regex("\\d+").all();
-        List<String> titleList = html.css("#pl .p_title a[id=\"\"]", "innerHtml").replace("<[^>]+>", "").all();
-        List<String> hrefList = html.css("#pl .p_title a[id=\"\"]", "href").all();
-        List<String> replyAndPageViewCountList = html.css("tr .p_re", "text").all();
-        List<String> lastReplyTimeList = html.css(".p_retime a", "text").all();
+//        List<String> idList = html.css("#pl tr", "mid").regex("\\d+").all();
+//        List<String> titleList = html.css("#pl .p_title a[id=\"\"]", "innerHtml").replace("<[^>]+>", "").all();
+//        List<String> hrefList = html.css("#pl .p_title a[id=\"\"]", "href").all();
+//        List<String> replyAndPageViewCountList = html.css("tr .p_re", "text").all();
+//        List<String> lastReplyTimeList = html.css(".p_retime a", "text").all();
+        List<String> idList = html.css(".titlelink a", "href").regex("\\/(\\d+)\\.html").all();
+        List<String> titleList = html.css(".titlelink a").regex("<a.*href=\"\\/\\d+\\.html.*<\\/a>").replace("<[^>]+>", "").all();
+        List<String> hrefList = html.css(".titlelink a", "href").regex("\\/\\d+\\.html").all();
+        List<String> replyAndPageViewCountList = html.css(".ansour", "text").all();
+        List<String> lastReplyTimeList = html.css(".endreply a", "text").all();
         if (titleList == null || titleList.isEmpty()) {
             //skip this page
             page.setSkip(true);
@@ -147,7 +156,13 @@ public class ArticleListPageProcessor implements PageProcessor {
 
         // 部分三：从页面发现后续的url地址来抓取
         //列表页
-        List<String> postListUrls = page.getHtml().css("div.page").links().regex(".*/" + topicName + "(-\\d)?.*", 0).all();
+        List<String> postListUrls = new ArrayList<String>(0);
+        Matcher listHeadPageMatcher = listHeadPagePattern.matcher(page.getUrl().toString());
+        if (listHeadPageMatcher.matches()) {
+            for (int pageNumber = 2; pageNumber <= 10; pageNumber ++) {
+                postListUrls.add(page.getUrl().toString() + "-" + pageNumber);
+            }
+        }
         if (limitPageNumber > 0) {
             postListUrls = getLimitedPageUrls(postListUrls);
         }
