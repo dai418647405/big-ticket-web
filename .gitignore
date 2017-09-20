@@ -6,3 +6,4 @@ big-ticket-web/src/main/webapp/WEB-INF/classes
 big-ticket-web/src/main/webapp/WEB-INF/test-classes
 big-ticket-web/src/main/webapp/WEB-INF/lib
 .idea
+/pom.xml
