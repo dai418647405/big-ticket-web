@@ -1,4 +1,4 @@
-*.iml
+big-ticket-web/big-ticket-web.iml
 target
 node_modules
 big-ticket-web/src/main/webapp/META-INF
