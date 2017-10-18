@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Async;
+import us.codecraft.webmagic.Site;
 import us.codecraft.webmagic.Spider;
 import us.codecraft.webmagic.downloader.HttpClientDownloader;
 import us.codecraft.webmagic.processor.PageProcessor;
@@ -23,7 +24,10 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Properties;
 
 /**
  * Created by daijing03 on 17/5/26.
@@ -43,6 +47,10 @@ public class HupuSpider implements SpiderScheduler {
     @Getter
     @Setter
     private Integer threadNum = 20;
+
+    @Getter
+    @Setter
+    private boolean needCookie;
 
     @Getter
     @Setter
@@ -157,6 +165,21 @@ public class HupuSpider implements SpiderScheduler {
         return curTime.equals(startTime) || curTime.equals(endTime) || (curTime.after(startTime) && curTime.before(endTime));
     }
 
+    private void setCookie(Site site) {
+        try {
+            site.getCookies().clear();
+            //读取配置值
+            BufferedReader cookieBr = new BufferedReader(new FileReader("/data/appdatas/big-ticket-web/cookie.properties"));
+            Properties prop = new Properties();
+            prop.load(cookieBr);
+            for (String cookieProp : prop.stringPropertyNames()) {
+                site.addCookie(cookieProp, prop.getProperty(cookieProp));
+            }
+        } catch (Exception e) {
+            logger.error("设置cookie失败", e);
+        }
+    }
+
     @Async
     @Override
     public void schedule() {
@@ -185,6 +208,9 @@ public class HupuSpider implements SpiderScheduler {
         } else {
             listPageProcessor.setLimitPageNumber(limitPageNumber);
             logger.info("start 热点数据爬取 taskName=" + taskName + ",limitPageNumber=" + limitPageNumber);
+        }
+        if (needCookie) {
+            this.setCookie(listPageProcessor.getSite());
         }
         Spider voteSpider = Spider.create(processor)
                 .addUrl(url)

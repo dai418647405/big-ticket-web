@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.daijing.big.ticket.dao.hupu.mapper.LolArticleMapper" >
+
+    <resultMap id="BaseResultMap" type="org.daijing.big.ticket.dao.hupu.po.ListRecordPO" >
+        <result column="id" property="id" jdbcType="INTEGER" />
+        <result column="article_id" property="articleId" jdbcType="INTEGER" />
+        <result column="title" property="title" jdbcType="VARCHAR" />
+        <result column="link" property="link" jdbcType="VARCHAR" />
+        <result column="reply_count" property="replyCount" jdbcType="INTEGER" />
+        <result column="page_view_count" property="pageViewCount" jdbcType="INTEGER" />
+        <result column="publish_time" property="publishTime" jdbcType="TIMESTAMP" />
+        <result column="last_reply_time" property="lastReplyTime" jdbcType="TIMESTAMP" />
+        <result column="gmt_create" property="gmtCreate" jdbcType="TIMESTAMP" />
+        <result column="gmt_modified" property="gmtModified" jdbcType="TIMESTAMP" />
+    </resultMap>
+
+    <sql id="Base_Column_List" >
+        article_id, title, link, reply_count, page_view_count, publish_time, last_reply_time, gmt_create
+    </sql>
+
+    <insert id="batchAdd">
+        INSERT INTO lol_article(<include refid="Base_Column_List"/> )
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.articleId}, #{item.title}, #{item.link}, #{item.replyCount}, #{item.pageViewCount}, #{item.publishTime}, #{item.lastReplyTime}, now())
+        </foreach>
+        ON duplicate KEY UPDATE
+        title = VALUES(title),
+        link = VALUES(link),
+        reply_count = VALUES(reply_count),
+        page_view_count = VALUES(page_view_count),
+        last_reply_time = VALUES(last_reply_time)
+    </insert>
+
+    <insert id="addPublishTime" parameterType="org.daijing.big.ticket.dao.hupu.po.ListRecordPO">
+        INSERT INTO lol_article(article_id, title, link, publish_time)
+        VALUES (#{po.articleId}, 'placeholder', 'placeholder',  #{po.publishTime})
+        ON duplicate KEY UPDATE
+        publish_time = VALUES(publish_time)
+    </insert>
+
+    <insert id="batchAddPublishTime">
+        INSERT INTO lol_article(article_id, title, link, publish_time)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.articleId}, 'placeholder', 'placeholder',  #{item.publishTime})
+        </foreach>
+        ON duplicate KEY UPDATE
+        publish_time = VALUES(publish_time)
+    </insert>
+
+    <select id="getListTotalNum" resultType="int">
+        SELECT COUNT(*)
+        FROM lol_article
+    </select>
+
+    <select id="getListByPageAndSort" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM lol_article
+        <choose>
+            <when test="sortType == 1">
+                ORDER BY last_reply_time DESC
+            </when>
+            <when test="sortType == 2">
+                ORDER BY publish_time DESC
+            </when>
+            <when test="sortType == 3">
+                WHERE publish_time >= CURDATE() ORDER BY page_view_count DESC
+            </when>
+            <when test="sortType == 4">
+                <![CDATA[
+                  WHERE publish_time >=  DATE_SUB(CURDATE(), INTERVAL 3 DAY)
+                  AND publish_time < CURDATE()
+                ]]>
+                ORDER BY page_view_count DESC
+            </when>
+            <when test="sortType == 5">
+                <![CDATA[
+                WHERE publish_time >=  DATE_SUB(CURDATE(), INTERVAL 7 DAY)
+                AND publish_time < CURDATE()
+                ]]>
+                ORDER BY page_view_count DESC
+            </when>
+            <when test="sortType == 6">
+                ORDER BY page_view_count DESC
+            </when>
+        </choose>
+        limit #{begin, jdbcType=INTEGER}, #{offset, jdbcType=INTEGER}
+    </select>
+</mapper>

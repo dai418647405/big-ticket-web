@@ -1,6 +1,5 @@
 package org.daijing.big.ticket.utils;
 
-import org.daijing.big.ticket.dao.hupu.mapper.ArticleMapper;
 import org.daijing.big.ticket.dao.hupu.mapper.*;
 import org.daijing.big.ticket.enums.TopicEnum;
 import org.slf4j.Logger;
@@ -26,6 +25,10 @@ public class ArticleMapperFactory {
     private MovieArticleMapper movieArticleMapper;
     @Autowired
     private WalkingStreetArticleMapper walkingStreetArticleMapper;
+    @Autowired
+    private KogArticleMapper kogArticleMapper;
+    @Autowired
+    private LolArticleMapper lolArticleMapper;
 
     public ArticleMapper getArticleMapperByTopicId(Integer topicId) {
         TopicEnum topicEnum = TopicEnum.getTopicEnumById(topicId);
@@ -42,6 +45,10 @@ public class ArticleMapperFactory {
                 return gameArticleMapper;
             case ACG:
                 return acgArticleMapper;
+            case KOG:
+                return kogArticleMapper;
+            case LOL:
+                return lolArticleMapper;
             default:
                 logger.error("无效的topicId:" + topicId); return null;
         }

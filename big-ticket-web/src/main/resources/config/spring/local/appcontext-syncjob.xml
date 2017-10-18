@@ -31,6 +31,7 @@
         <property name="threadNum" value="20"/>
         <property name="processor" ref="walkingStreetProcessor"/>
         <property name="limitPageNumber" value="30"/>
+        <property name="needCookie" value="true"/>
     </bean>
 
     <bean id="footBallProcessor" class="org.daijing.big.ticket.crawler.hupu.processor.ArticleListPageProcessor">
@@ -85,13 +86,41 @@
         <property name="limitPageNumber" value="10"/>
     </bean>
 
+    <bean id="kogProcessor" class="org.daijing.big.ticket.crawler.hupu.processor.ArticleListPageProcessor">
+        <property name="topicName" value="kog" />
+        <property name="topicId" value="7" />
+    </bean>
+
+    <bean id="kogSpider" class="org.daijing.big.ticket.crawler.hupu.spider.HupuSpider">
+        <property name="taskName" value="王者荣耀区爬虫任务"/>
+        <property name="url" value="https://bbs.hupu.com/kog"/>
+        <property name="threadNum" value="5"/>
+        <property name="processor" ref="kogProcessor"/>
+        <property name="limitPageNumber" value="10"/>
+    </bean>
+
+    <bean id="lolProcessor" class="org.daijing.big.ticket.crawler.hupu.processor.ArticleListPageProcessor">
+        <property name="topicName" value="lol" />
+        <property name="topicId" value="8" />
+    </bean>
+
+    <bean id="lolSpider" class="org.daijing.big.ticket.crawler.hupu.spider.HupuSpider">
+        <property name="taskName" value="LOL区爬虫任务"/>
+        <property name="url" value="https://bbs.hupu.com/lol"/>
+        <property name="threadNum" value="5"/>
+        <property name="processor" ref="lolProcessor"/>
+        <property name="limitPageNumber" value="10"/>
+    </bean>
+
     <task:scheduled-tasks>
         <task:scheduled ref="hupuVoteSpider" method="schedule" cron="0 0/10 * * * ?" />
         <task:scheduled ref="walkingStreetSpider" method="schedule" cron="0 0/10 * * * ?" />
         <task:scheduled ref="footBallSpider" method="schedule" cron="0 0/10 * * * ?" />
-        <task:scheduled ref="movieSpider" method="schedule" cron="0 0/10 * * * ?" />
-        <task:scheduled ref="gameSpider" method="schedule" cron="0 0/10 * * * ?" />
+        <!--<task:scheduled ref="movieSpider" method="schedule" cron="0 15 17 * * ?" />-->
+        <!--<task:scheduled ref="gameSpider" method="schedule" cron="0 15 17 * * ?" />-->
         <task:scheduled ref="acgSpider" method="schedule" cron="0 0/10 * * * ?" />
+        <task:scheduled ref="kogSpider" method="schedule" cron="0 0/10 * * * ?" />
+        <task:scheduled ref="lolSpider" method="schedule" cron="0 0/10 * * * ?" />
     </task:scheduled-tasks>
 
     <!-- 缺省的异步任务线程池 -->

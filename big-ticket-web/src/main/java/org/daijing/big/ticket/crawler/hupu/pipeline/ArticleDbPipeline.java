@@ -49,6 +49,10 @@ public class ArticleDbPipeline implements Pipeline {
     private MovieArticleMapper movieArticleMapper;
     @Autowired
     private WalkingStreetArticleMapper walkingStreetArticleMapper;
+    @Autowired
+    private KogArticleMapper kogArticleMapper;
+    @Autowired
+    private LolArticleMapper lolArticleMapper;
 
     private List<ListRecordPO> poWithPublishTimeList = new ArrayList<ListRecordPO>(SpiderConstant.BATCH_NUM);
 
@@ -130,6 +134,8 @@ public class ArticleDbPipeline implements Pipeline {
             case MOVIE : movieArticleMapper.batchAddPublishTime(poWithPublishTimeList); break;
             case GAME : gameArticleMapper.batchAddPublishTime(poWithPublishTimeList); break;
             case ACG : acgArticleMapper.batchAddPublishTime(poWithPublishTimeList); break;
+            case KOG : kogArticleMapper.batchAddPublishTime(poWithPublishTimeList); break;
+            case LOL : lolArticleMapper.batchAddPublishTime(poWithPublishTimeList); break;
             default: ;
         }
     }
@@ -143,6 +149,8 @@ public class ArticleDbPipeline implements Pipeline {
             case MOVIE : movieArticleMapper.batchAdd(list); break;
             case GAME : gameArticleMapper.batchAdd(list); break;
             case ACG : acgArticleMapper.batchAdd(list); break;
+            case KOG : kogArticleMapper.batchAdd(list); break;
+            case LOL : lolArticleMapper.batchAdd(list); break;
             default: ;
         }
     }
