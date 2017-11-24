@@ -116,9 +116,9 @@
         <task:scheduled ref="hupuVoteSpider" method="schedule" cron="0 0/10 * * * ?" />
         <task:scheduled ref="walkingStreetSpider" method="schedule" cron="0 0/10 * * * ?" />
         <task:scheduled ref="footBallSpider" method="schedule" cron="0 0/10 * * * ?" />
-        <!--<task:scheduled ref="movieSpider" method="schedule" cron="0 15 17 * * ?" />-->
+        <task:scheduled ref="movieSpider" method="schedule" cron="0 0/10 * * * ?" />
         <!--<task:scheduled ref="gameSpider" method="schedule" cron="0 15 17 * * ?" />-->
-        <task:scheduled ref="acgSpider" method="schedule" cron="0 0/10 * * * ?" />
+        <!--<task:scheduled ref="acgSpider" method="schedule" cron="0 0/10 * * * ?" />-->
         <task:scheduled ref="kogSpider" method="schedule" cron="0 0/10 * * * ?" />
         <task:scheduled ref="lolSpider" method="schedule" cron="0 0/10 * * * ?" />
     </task:scheduled-tasks>
