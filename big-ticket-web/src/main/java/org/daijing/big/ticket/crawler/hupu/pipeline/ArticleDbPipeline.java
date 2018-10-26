@@ -98,12 +98,14 @@ public class ArticleDbPipeline implements Pipeline {
 
     private void outputListPageData(ResultItems resultItems, Integer topicId) {
         DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        DateFormat sdfV2 = new SimpleDateFormat("yyyy-MM-dd");
         List<String> idList = resultItems.get("idList");
         List<String> titleList = resultItems.get("titleList");
         List<String> hrefList = resultItems.get("hrefList");
         List<String> replyCountList = resultItems.get("replyCountList");
         List<String> pageViewCountList = resultItems.get("pageViewCountList");
         List<String> lastReplyTimeList = resultItems.get("lastReplyTimeList");
+        List<String> publishTimeList = resultItems.get("publishTimeList");
         List<ListRecordPO> list = new ArrayList<ListRecordPO>(idList.size());
         try {
             SpiderUtil.handleReplyTimeFormat(lastReplyTimeList);
@@ -116,6 +118,7 @@ public class ArticleDbPipeline implements Pipeline {
                 po.setReplyCount(Integer.valueOf(replyCountList.get(index)));
                 po.setPageViewCount(Integer.valueOf(pageViewCountList.get(index)));
                 po.setLastReplyTime(sdf.parse(lastReplyTimeList.get(index)));
+                po.setPublishTime(sdfV2.parse(publishTimeList.get(index)));
                 list.add(po);
             }
         } catch (ParseException e) {

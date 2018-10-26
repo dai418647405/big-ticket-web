@@ -18,6 +18,7 @@
         <property name="threadNum" value="20"/>
         <property name="processor" ref="hupuVoteProcessor"/>
         <property name="limitPageNumber" value="30"/>
+        <property name="needCookie" value="true"/>
     </bean>
 
     <bean id="walkingStreetProcessor" class="org.daijing.big.ticket.crawler.hupu.processor.ArticleListPageProcessor">
@@ -45,6 +46,7 @@
         <property name="threadNum" value="5"/>
         <property name="processor" ref="footBallProcessor"/>
         <property name="limitPageNumber" value="10"/>
+        <property name="needCookie" value="true"/>
     </bean>
 
     <bean id="movieProcessor" class="org.daijing.big.ticket.crawler.hupu.processor.ArticleListPageProcessor">
@@ -58,6 +60,7 @@
         <property name="threadNum" value="5"/>
         <property name="processor" ref="movieProcessor"/>
         <property name="limitPageNumber" value="10"/>
+        <property name="needCookie" value="true"/>
     </bean>
 
     <bean id="gameProcessor" class="org.daijing.big.ticket.crawler.hupu.processor.ArticleListPageProcessor">
@@ -71,6 +74,7 @@
         <property name="threadNum" value="5"/>
         <property name="processor" ref="gameProcessor"/>
         <property name="limitPageNumber" value="10"/>
+        <property name="needCookie" value="true"/>
     </bean>
 
     <bean id="acgProcessor" class="org.daijing.big.ticket.crawler.hupu.processor.ArticleListPageProcessor">
@@ -84,6 +88,7 @@
         <property name="threadNum" value="5"/>
         <property name="processor" ref="acgProcessor"/>
         <property name="limitPageNumber" value="10"/>
+        <property name="needCookie" value="true"/>
     </bean>
 
     <bean id="kogProcessor" class="org.daijing.big.ticket.crawler.hupu.processor.ArticleListPageProcessor">
@@ -97,6 +102,7 @@
         <property name="threadNum" value="5"/>
         <property name="processor" ref="kogProcessor"/>
         <property name="limitPageNumber" value="10"/>
+        <property name="needCookie" value="true"/>
     </bean>
 
     <bean id="lolProcessor" class="org.daijing.big.ticket.crawler.hupu.processor.ArticleListPageProcessor">
@@ -110,6 +116,7 @@
         <property name="threadNum" value="5"/>
         <property name="processor" ref="lolProcessor"/>
         <property name="limitPageNumber" value="10"/>
+        <property name="needCookie" value="true"/>
     </bean>
 
     <task:scheduled-tasks>

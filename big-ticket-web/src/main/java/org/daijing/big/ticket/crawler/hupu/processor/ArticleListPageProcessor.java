@@ -105,16 +105,12 @@ public class ArticleListPageProcessor implements PageProcessor {
         }
         // 部分二：定义如何抽取页面信息，并保存下来
         Html html = page.getHtml();
-//        List<String> idList = html.css("#pl tr", "mid").regex("\\d+").all();
-//        List<String> titleList = html.css("#pl .p_title a[id=\"\"]", "innerHtml").replace("<[^>]+>", "").all();
-//        List<String> hrefList = html.css("#pl .p_title a[id=\"\"]", "href").all();
-//        List<String> replyAndPageViewCountList = html.css("tr .p_re", "text").all();
-//        List<String> lastReplyTimeList = html.css(".p_retime a", "text").all();
         List<String> idList = html.css(".titlelink a", "href").regex("\\/(\\d+)\\.html").all();
         List<String> titleList = html.css(".titlelink a").regex("<a.*href=\"\\/\\d+\\.html.*<\\/a>").replace("<[^>]+>", "").all();
         List<String> hrefList = html.css(".titlelink a", "href").regex("\\/\\d+\\.html").all();
         List<String> replyAndPageViewCountList = html.css(".ansour", "text").all();
         List<String> lastReplyTimeList = html.css(".endreply a", "text").all();
+        List<String> publishTimeList = html.css(".author.box a[style^=color]", "text").all();
         if (titleList == null || titleList.isEmpty()) {
             //skip this page
             page.setSkip(true);
@@ -151,6 +147,7 @@ public class ArticleListPageProcessor implements PageProcessor {
             page.putField("replyCountList", replyCountList);
             page.putField("pageViewCountList", pageViewCountList);
             page.putField("lastReplyTimeList", lastReplyTimeList);
+            page.putField("publishTimeList", publishTimeList);
             page.putField("pageType", HupuPageTypeEnum.LIST_PAGE.getType());
             page.putField("topicId", topicId);
         }
@@ -169,9 +166,9 @@ public class ArticleListPageProcessor implements PageProcessor {
         }
         page.addTargetRequests(postListUrls);
         //详情页
-        if (hrefList != null && !hrefList.isEmpty()) {
-            page.addTargetRequests(hrefList);
-        }
+//        if (hrefList != null && !hrefList.isEmpty()) {
+//            page.addTargetRequests(hrefList);
+//        }
     }
 
     @Override
