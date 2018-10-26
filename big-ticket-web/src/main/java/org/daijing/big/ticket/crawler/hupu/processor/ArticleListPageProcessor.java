@@ -63,6 +63,7 @@ public class ArticleListPageProcessor implements PageProcessor {
 
     // 部分一：抓取网站的相关配置，包括编码、抓取间隔、重试次数等
     private Site site = Site.me()
+            .setDomain("bbs.hupu.com")
             .setCycleRetryTimes(DOWNLOAD_FAILED_CYCLE_RETRY_TIMES)
             .setRetryTimes(HTTP_CLIENT_CONN_TIMEOUT_RETRY_TIMES)
             .setSleepTime(CRAWL_TIME_INTERVAL)
