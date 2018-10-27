@@ -58,6 +58,8 @@ public class ArticleDbPipeline implements Pipeline {
 
     private Lock lock = new ReentrantLock();// 锁对象
 
+    private Lock dbLock = new ReentrantLock();// 锁对象
+
     @Override
     public void process(ResultItems resultItems, Task task) {
         //如果是帖子详情页
@@ -144,17 +146,22 @@ public class ArticleDbPipeline implements Pipeline {
     }
 
     private void batchAdd(Integer topicId, List<ListRecordPO> list) {
-        TopicEnum topicEnum = TopicEnum.getTopicEnumById(topicId);
-        switch (topicEnum) {
-            case SHI_HU_HU : voteArticleMapper.batchAdd(list); break;
-            case WALKING_STREET : walkingStreetArticleMapper.batchAdd(list); break;
-            case FOOTBALL : footBallArticleMapper.batchAdd(list); break;
-            case MOVIE : movieArticleMapper.batchAdd(list); break;
-            case GAME : gameArticleMapper.batchAdd(list); break;
-            case ACG : acgArticleMapper.batchAdd(list); break;
-            case KOG : kogArticleMapper.batchAdd(list); break;
-            case LOL : lolArticleMapper.batchAdd(list); break;
-            default: ;
+        dbLock.lock();
+        try {
+            TopicEnum topicEnum = TopicEnum.getTopicEnumById(topicId);
+            switch (topicEnum) {
+                case SHI_HU_HU : voteArticleMapper.batchAdd(list); break;
+                case WALKING_STREET : walkingStreetArticleMapper.batchAdd(list); break;
+                case FOOTBALL : footBallArticleMapper.batchAdd(list); break;
+                case MOVIE : movieArticleMapper.batchAdd(list); break;
+                case GAME : gameArticleMapper.batchAdd(list); break;
+                case ACG : acgArticleMapper.batchAdd(list); break;
+                case KOG : kogArticleMapper.batchAdd(list); break;
+                case LOL : lolArticleMapper.batchAdd(list); break;
+                default: ;
+            }
+        } finally {
+            dbLock.unlock();
         }
     }
 
