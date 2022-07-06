@@ -17,7 +17,7 @@
         <env>qa</env>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <spring.version>3.2.3.RELEASE</spring.version>
-        <spring-data.version>1.2.0.RELEASE</spring-data.version>
+        <spring-data.version>1.11.23.RELEASE</spring-data.version>
         <!-- mybatis版本号 -->
         <mybatis.version>3.2.4</mybatis.version>
         <!-- log4j日志文件管理包版本 -->
